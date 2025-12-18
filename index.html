@@ -108,15 +108,40 @@
         .tb-value { flex-grow: 1; }
         .tb-project { font-size: 14px; font-weight: bold; color: var(--drawing-yellow); margin-bottom: 10px; border-bottom: 1px solid white; padding-bottom: 5px; }
 
+        /* Export Button Styles */
+        .export-btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .export-btn.svg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .export-btn.svg:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
     </style>
 </head>
 <body>
 
     <!-- Sidebar Control Panel -->
     <div class="sidebar">
-        <h2>🔧 Settings</h2>
+        <h2>Edit</h2>
         
-        <div class="section-header">Title Block Info</div>
+        <div class="section-header">Title</div>
         <div class="form-group">
             <label>Project Name</label>
             <input type="text" id="inp-project" value="CIVIL PARK INTERNATIONAL">
@@ -199,6 +224,11 @@
                 <input type="number" id="inp-s-mid" value="200">
             </div>
         </div>
+
+        <div class="section-header">Export</div>
+        <button class="export-btn svg" onclick="exportSVG()">
+            Export SVG
+        </button>
     </div>
 
     <!-- Drawing Area -->
@@ -215,13 +245,17 @@
                 <div class="tb-row">
                     <span class="tb-label"><span id="lbl-title">DWG TITLE</span>:</span>
                     <span class="tb-value" id="tb-title">...</span>
-                    <span class="tb-label" style="width: 40px;">DATE:</span>
+                </div>
+                <div class="tb-row">
+                    <span class="tb-label">DATE:</span>
                     <span class="tb-value" id="tb-date">...</span>
                 </div>
                 <div class="tb-row">
                     <span class="tb-label"><span id="lbl-drawn">DRAWN BY</span>:</span>
                     <span class="tb-value" id="tb-drawn-val">...</span>
-                    <span class="tb-label" style="width: 40px;">SCALE:</span>
+                </div>
+                <div class="tb-row">
+                    <span class="tb-label">SCALE:</span>
                     <span class="tb-value" id="tb-scale">...</span>
                 </div>
                 <div class="tb-row">
@@ -254,7 +288,6 @@
             tieSize: document.getElementById('inp-tie-size'),
             sZone: document.getElementById('inp-s-zone'),
             sMid: document.getElementById('inp-s-mid'),
-            mainCountDisplay: document.getElementById('inp-main-count'),
             mainCountDisplay: document.getElementById('inp-main-count'),
             // Inputs for Values
             titleVal: document.getElementById('inp-title-val'),
@@ -470,49 +503,75 @@
             group.appendChild(textH);
 
             // Leader Lines & Text
-            const lx1 = startX + w - 30; // Pointing to top right bar roughly
-            const ly1 = startY + 20;
-            const lx2 = startX + w + 80;
-            const ly2 = startY + 20;
+            // Dog-leg style: angled line from element + horizontal line for text (engineering standard)
             
-            // Rebar Label (Main Bars)
-            group.appendChild(createEl('line', { x1: lx1, y1: ly1, x2: lx2, y2: ly2, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' }));
-            const labelRebar = createEl('text', { x: lx2 + 5, y: ly2+5, class: 'label-text' });
+            // Rebar Label (Main Bars) - pointing to top-right bar
+            const barPointX = stX + stW;  // Right side bar X
+            const barPointY = stY;        // Top bar Y
+            const barMidX = startX + w + 40;
+            const barMidY = startY - 20;
+            const barEndX = startX + w + 100;
+            
+            // Angled line from bar to midpoint
+            group.appendChild(createEl('path', { 
+                d: `M ${barPointX} ${barPointY} L ${barMidX} ${barMidY}`, 
+                stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' 
+            }));
+            // Horizontal line from midpoint
+            group.appendChild(createEl('line', { 
+                x1: barMidX, y1: barMidY, x2: barEndX, y2: barMidY, 
+                stroke:'#00FFFF', 'stroke-width':0.5 
+            }));
+            const labelRebar = createEl('text', { x: barEndX + 5, y: barMidY + 5, class: 'label-text' });
             const total = (2*state.nx + 2*(state.ny-2));
             labelRebar.textContent = `${total}-${state.mainSize}`;
             group.appendChild(labelRebar);
-            const subLabelRebar = createEl('text', { x: lx2 + 5, y: ly2+20, class: 'sub-label' });
+            const subLabelRebar = createEl('text', { x: barEndX + 5, y: barMidY + 20, class: 'sub-label' });
             subLabelRebar.textContent = "Main Bars";
             group.appendChild(subLabelRebar);
 
-            // Main Ties Label (ชี้ที่เหล็กปลอก)
-            // ชี้ไปที่ขาปลอกด้านขวา (stX + stW) = startX + w - state.cover
-            const ty1 = startY + h/2; // กลางเสา
-            const tx1 = startX + w - state.cover;   // ขอบขวาปลอก (ลบ cover ออก)
-            const tx2 = startX + w + 80; // ปลายเส้น Leader
+            // Main Ties Label - pointing to stirrup right side
+            const tiePointX = stX + stW;      // Stirrup right edge
+            const tiePointY = stY + stH/2;    // Middle height
+            const tieMidX = startX + w + 40;
+            const tieMidY = startY + h/2 - 30;
+            const tieEndX = startX + w + 100;
             
-            group.appendChild(createEl('line', { x1: tx1, y1: ty1, x2: tx2, y2: ty1, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' }));
-            const labelTie = createEl('text', { x: tx2 + 5, y: ty1 + 5, class: 'label-text' });
+            group.appendChild(createEl('path', { 
+                d: `M ${tiePointX} ${tiePointY} L ${tieMidX} ${tieMidY}`, 
+                stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' 
+            }));
+            group.appendChild(createEl('line', { 
+                x1: tieMidX, y1: tieMidY, x2: tieEndX, y2: tieMidY, 
+                stroke:'#00FFFF', 'stroke-width':0.5 
+            }));
+            const labelTie = createEl('text', { x: tieEndX + 5, y: tieMidY + 5, class: 'label-text' });
             labelTie.textContent = state.tieSize;
             group.appendChild(labelTie);
-            const subLabelTie = createEl('text', { x: tx2 + 5, y: ty1 + 20, class: 'sub-label' });
+            const subLabelTie = createEl('text', { x: tieEndX + 5, y: tieMidY + 20, class: 'sub-label' });
             subLabelTie.textContent = "Main Ties";
             group.appendChild(subLabelTie);
 
-            // Cross Ties Label (ชี้ที่เหล็กยึดกลาง - ถ้ามี)
+            // Cross Ties Label - pointing to internal ties (if present)
             if (state.nx > 2 || state.ny > 2) {
-                const cy1 = startY + h/2 + 40; // ต่ำลงมาหน่อย
-                // ชี้ไปที่เส้น Cross Tie แนวนอนเส้นกลางๆ (ประมาณกลางเสา)
-                const cx1 = startX + w/2; 
-                const cx2 = startX + w + 80;
+                const crossPointX = stX + stW/2;  // Center of column
+                const crossPointY = stY + stH/2;
+                const crossMidX = startX + w + 40;
+                const crossMidY = startY + h/2 + 30;
+                const crossEndX = startX + w + 100;
                 
-                // วาดเส้นจากกลางเสาออกมา (อาจจะทับเส้นอื่นบ้างแต่ให้เห็นภาพ)
-                group.appendChild(createEl('line', { x1: cx1, y1: cy1, x2: cx2, y2: cy1 + 20, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' }));
-                
-                const labelCross = createEl('text', { x: cx2 + 5, y: cy1 + 25, class: 'label-text' });
+                group.appendChild(createEl('path', { 
+                    d: `M ${crossPointX} ${crossPointY} L ${crossMidX} ${crossMidY}`, 
+                    stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' 
+                }));
+                group.appendChild(createEl('line', { 
+                    x1: crossMidX, y1: crossMidY, x2: crossEndX, y2: crossMidY, 
+                    stroke:'#00FFFF', 'stroke-width':0.5 
+                }));
+                const labelCross = createEl('text', { x: crossEndX + 5, y: crossMidY + 5, class: 'label-text' });
                 labelCross.textContent = state.tieSize;
                 group.appendChild(labelCross);
-                const subLabelCross = createEl('text', { x: cx2 + 5, y: cy1 + 40, class: 'sub-label' });
+                const subLabelCross = createEl('text', { x: crossEndX + 5, y: crossMidY + 20, class: 'sub-label' });
                 subLabelCross.textContent = "Cross Ties";
                 group.appendChild(subLabelCross);
             }
@@ -612,6 +671,185 @@
             group.appendChild(title);
 
             svg.appendChild(group);
+        }
+
+        // --- Export SVG Function ---
+        function exportSVG() {
+            // Get the SVG element
+            const svgElement = document.getElementById('main-svg');
+            
+            // Clone the SVG to avoid modifying the original
+            const clonedSvg = svgElement.cloneNode(true);
+            
+            // Get computed styles for colors
+            const blueprintBg = getComputedStyle(document.documentElement).getPropertyValue('--blueprint-bg').trim() || '#0a244d';
+            const blueprintGrid = getComputedStyle(document.documentElement).getPropertyValue('--blueprint-grid').trim() || '#1c3b6b';
+            
+            // Create background and grid pattern
+            const viewBox = clonedSvg.getAttribute('viewBox').split(' ').map(Number);
+            const [vbX, vbY, vbW, vbH] = viewBox;
+            
+            // Create defs for pattern and insert at the beginning
+            let defs = clonedSvg.querySelector('defs');
+            if (!defs) {
+                defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                clonedSvg.insertBefore(defs, clonedSvg.firstChild);
+            }
+            
+            // Add grid pattern
+            const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+            pattern.setAttribute('id', 'grid');
+            pattern.setAttribute('width', '40');
+            pattern.setAttribute('height', '40');
+            pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+            
+            const gridPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            gridPath.setAttribute('d', 'M 40 0 L 0 0 0 40');
+            gridPath.setAttribute('fill', 'none');
+            gridPath.setAttribute('stroke', blueprintGrid);
+            gridPath.setAttribute('stroke-width', '1');
+            pattern.appendChild(gridPath);
+            defs.appendChild(pattern);
+            
+            // Create background rect with grid
+            const bgGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            bgGroup.setAttribute('id', 'background');
+            
+            // Solid background
+            const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bgRect.setAttribute('x', vbX - 50);
+            bgRect.setAttribute('y', vbY - 50);
+            bgRect.setAttribute('width', vbW + 100);
+            bgRect.setAttribute('height', vbH + 100);
+            bgRect.setAttribute('fill', blueprintBg);
+            bgGroup.appendChild(bgRect);
+            
+            // Grid overlay
+            const gridRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            gridRect.setAttribute('x', vbX - 50);
+            gridRect.setAttribute('y', vbY - 50);
+            gridRect.setAttribute('width', vbW + 100);
+            gridRect.setAttribute('height', vbH + 100);
+            gridRect.setAttribute('fill', 'url(#grid)');
+            bgGroup.appendChild(gridRect);
+            
+            // Insert background at the beginning (after defs)
+            clonedSvg.insertBefore(bgGroup, defs.nextSibling);
+            
+            // --- Add Title Block to SVG ---
+            const titleBlockGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            titleBlockGroup.setAttribute('id', 'title-block');
+            titleBlockGroup.setAttribute('transform', `translate(${vbX + vbW - 350}, ${vbY + vbH - 180})`);
+            
+            // Title block background
+            const tbBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            tbBg.setAttribute('x', '0');
+            tbBg.setAttribute('y', '0');
+            tbBg.setAttribute('width', '320');
+            tbBg.setAttribute('height', '160');
+            tbBg.setAttribute('fill', 'rgba(10, 36, 77, 0.95)');
+            tbBg.setAttribute('stroke', 'white');
+            tbBg.setAttribute('stroke-width', '2');
+            titleBlockGroup.appendChild(tbBg);
+            
+            // Get values from inputs
+            const projectName = inputs.project ? inputs.project.value.toUpperCase() : 'PROJECT';
+            const titleVal = inputs.titleVal ? inputs.titleVal.value.toUpperCase() : '';
+            const dateVal = inputs.dateVal ? inputs.dateVal.value : '';
+            const drawnVal = inputs.drawnVal ? inputs.drawnVal.value : '';
+            const scaleVal = inputs.scaleVal ? inputs.scaleVal.value : '';
+            const noteVal = inputs.noteVal ? inputs.noteVal.value : '';
+            const totalBars = 2 * state.nx + 2 * (state.ny - 2);
+            
+            // Project Title
+            const projectText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            projectText.setAttribute('x', '15');
+            projectText.setAttribute('y', '25');
+            projectText.setAttribute('fill', '#ffeb3b');
+            projectText.setAttribute('font-size', '14');
+            projectText.setAttribute('font-weight', 'bold');
+            projectText.setAttribute('font-family', 'Courier New, monospace');
+            projectText.textContent = `PROJECT: ${projectName}`;
+            titleBlockGroup.appendChild(projectText);
+            
+            // Separator line
+            const sepLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            sepLine.setAttribute('x1', '10');
+            sepLine.setAttribute('y1', '35');
+            sepLine.setAttribute('x2', '310');
+            sepLine.setAttribute('y2', '35');
+            sepLine.setAttribute('stroke', 'white');
+            sepLine.setAttribute('stroke-width', '1');
+            titleBlockGroup.appendChild(sepLine);
+            
+            // Helper function for text rows
+            function addTextRow(label, value, y) {
+                const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                labelText.setAttribute('x', '15');
+                labelText.setAttribute('y', y);
+                labelText.setAttribute('fill', 'white');
+                labelText.setAttribute('font-size', '11');
+                labelText.setAttribute('font-weight', 'bold');
+                labelText.setAttribute('font-family', 'Courier New, monospace');
+                labelText.textContent = label + ':';
+                titleBlockGroup.appendChild(labelText);
+                
+                const valText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                valText.setAttribute('x', '90');
+                valText.setAttribute('y', y);
+                valText.setAttribute('fill', 'white');
+                valText.setAttribute('font-size', '11');
+                valText.setAttribute('font-family', 'Courier New, monospace');
+                valText.textContent = value;
+                titleBlockGroup.appendChild(valText);
+            }
+            
+            addTextRow('DWG TITLE', titleVal, 52);
+            addTextRow('DATE', dateVal, 68);
+            addTextRow('DRAWN BY', drawnVal, 84);
+            addTextRow('SCALE', scaleVal, 100);
+            addTextRow('NOTE', `${totalBars}-${state.mainSize} ${noteVal}`, 116);
+            
+            clonedSvg.appendChild(titleBlockGroup);
+            
+            // Add required namespaces and styling
+            clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            clonedSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+            
+            // Add embedded styles
+            const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            styleEl.textContent = `
+                .concrete-outline { fill: none; stroke: white; stroke-width: 2; }
+                .stirrup { fill: none; stroke: #ffeb3b; stroke-width: 2; }
+                .main-bar { fill: white; stroke: none; }
+                .dim-line { stroke: white; stroke-width: 0.5; }
+                .label-text { fill: white; font-size: 14px; font-weight: bold; font-family: 'Courier New', monospace; }
+                .sub-label { fill: #aaaaaa; font-size: 12px; font-family: 'Courier New', monospace; }
+                .view-title { font-size: 20px; font-weight: bold; text-decoration: underline; fill: white; font-family: 'Courier New', monospace; }
+            `;
+            defs.appendChild(styleEl);
+            
+            // Serialize to string
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(clonedSvg);
+            
+            // Add XML declaration
+            svgString = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgString;
+            
+            // Create download link
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            const fileName = `${inputs.titleVal ? inputs.titleVal.value.replace(/\s+/g, '_') : 'column_reinforcement'}_${new Date().toISOString().slice(0,10)}.svg`;
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Cleanup
+            URL.revokeObjectURL(url);
         }
 
         // Start
