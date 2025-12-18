@@ -473,13 +473,26 @@
             });
             group.appendChild(stirrup);
             
-            // Hook annotation label
+            // Hook annotation labels with calculated lengths
+            // Parse tie diameter (e.g., "DB10" -> 10)
+            const tieDia = parseInt(state.tieSize.replace(/\D/g, '')) || 10;
+            const hookLengthMm = 6 * tieDia; // 6d hook extension
+            const bendRadius = 4 * tieDia;   // 4d bend radius for bars ≤ DB16
+            
             const hookLabel = createEl('text', { 
                 x: tlHookEndX - 5, y: tlHookEndY - 5, 
                 'text-anchor': 'end', class: 'sub-label', fill: '#ffeb3b' 
             });
-            hookLabel.textContent = '135° HOOK';
+            hookLabel.textContent = `135° HOOK (6d=${hookLengthMm}mm)`;
             group.appendChild(hookLabel);
+            
+            // Bend radius label (at corner)
+            const bendLabel = createEl('text', { 
+                x: stX + stW + 15, y: stY + 15, 
+                'text-anchor': 'start', class: 'sub-label', fill: '#ffeb3b' 
+            });
+            bendLabel.textContent = `r=${bendRadius}mm (4d)`;
+            group.appendChild(bendLabel);
 
             // 3. Main Bars
             // Calculate positions
@@ -507,6 +520,36 @@
                 barGroup.appendChild(createEl('circle', { cx: stX+stW, cy: cy, r: 8, class: 'main-bar' }));
             }
             group.appendChild(barGroup);
+            
+            // Clear Spacing Annotation (between first two bars on top row)
+            // Clear spacing = center-to-center spacing - bar diameter
+            const mainBarDia = parseInt(state.mainSize.replace(/\D/g, '')) || 25;
+            const actualSpacing = (stW / (state.nx - 1)) * (state.width / w); // Scale to actual mm
+            const clearSpacing = Math.round(actualSpacing - mainBarDia);
+            
+            if (state.nx >= 3) {
+                // Draw spacing dimension line between bar 1 and bar 2
+                const bar1X = stX + sx;
+                const bar2X = stX + 2 * sx;
+                const dimY = stY - 25;
+                
+                // Dimension line
+                group.appendChild(createEl('line', { 
+                    x1: bar1X, y1: dimY, x2: bar2X, y2: dimY, 
+                    stroke: '#aaa', 'stroke-width': 0.5 
+                }));
+                // Tick marks
+                group.appendChild(createEl('line', { x1: bar1X, y1: dimY-5, x2: bar1X, y2: dimY+5, stroke: '#aaa', 'stroke-width': 0.5 }));
+                group.appendChild(createEl('line', { x1: bar2X, y1: dimY-5, x2: bar2X, y2: dimY+5, stroke: '#aaa', 'stroke-width': 0.5 }));
+                
+                // Clear spacing label
+                const spacingLabel = createEl('text', { 
+                    x: (bar1X + bar2X) / 2, y: dimY - 5, 
+                    'text-anchor': 'middle', class: 'sub-label', fill: '#aaa' 
+                });
+                spacingLabel.textContent = `CLEAR ${clearSpacing}mm`;
+                group.appendChild(spacingLabel);
+            }
             
             // 4. Cross Ties (Simplified Logic: Connect opposing bars if > 2x2)
             // Vertical Ties (connect top-bottom) for internal cols
@@ -1033,7 +1076,82 @@
             addTextRow('SCALE', scaleVal, 100);
             addTextRow('NOTE', `${totalBars}-${state.mainSize} ${noteVal}`, 116);
             
+            // Revision line at bottom of title block
+            const revLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            revLine.setAttribute('x1', '0');
+            revLine.setAttribute('y1', '135');
+            revLine.setAttribute('x2', tbWidth);
+            revLine.setAttribute('y2', '135');
+            revLine.setAttribute('stroke', 'white');
+            revLine.setAttribute('stroke-width', '0.5');
+            titleBlockGroup.appendChild(revLine);
+            
+            const revText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            revText.setAttribute('x', '15');
+            revText.setAttribute('y', '150');
+            revText.setAttribute('fill', '#aaa');
+            revText.setAttribute('font-size', '10');
+            revText.setAttribute('font-family', 'Courier New, monospace');
+            revText.textContent = 'REV.0 - ORIGINAL ISSUE';
+            titleBlockGroup.appendChild(revText);
+            
             clonedSvg.appendChild(titleBlockGroup);
+            
+            // --- General Notes Box (left side, above title block) ---
+            const notesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            notesGroup.setAttribute('id', 'general-notes');
+            const notesX = vbX + innerMargin;
+            const notesY = vbY + vbH - innerMargin - 180;
+            const notesWidth = 280;
+            const notesHeight = 180;
+            notesGroup.setAttribute('transform', `translate(${notesX}, ${notesY})`);
+            
+            // Notes background
+            const notesBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            notesBg.setAttribute('x', '0');
+            notesBg.setAttribute('y', '0');
+            notesBg.setAttribute('width', notesWidth);
+            notesBg.setAttribute('height', notesHeight);
+            notesBg.setAttribute('fill', 'rgba(10, 36, 77, 0.9)');
+            notesBg.setAttribute('stroke', 'white');
+            notesBg.setAttribute('stroke-width', '1');
+            notesGroup.appendChild(notesBg);
+            
+            // Notes title
+            const notesTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            notesTitle.setAttribute('x', '10');
+            notesTitle.setAttribute('y', '20');
+            notesTitle.setAttribute('fill', 'white');
+            notesTitle.setAttribute('font-size', '12');
+            notesTitle.setAttribute('font-weight', 'bold');
+            notesTitle.setAttribute('font-family', 'Courier New, monospace');
+            notesTitle.textContent = 'GENERAL NOTES:';
+            notesGroup.appendChild(notesTitle);
+            
+            // Notes content
+            const generalNotes = [
+                "1. CONCRETE: fc'=" + (inputs.concrete ? inputs.concrete.value : '28 MPa'),
+                '2. STEEL: fy=' + (inputs.steel ? inputs.steel.value : 'SD40'),
+                '3. COVER TO STIRRUP: ' + state.cover + 'mm',
+                '4. LAP SPLICE: 50d MIN.',
+                '5. HOOK: 135° SEISMIC, 6d EXT.',
+                '6. BEND RADIUS: 4d FOR DB≤16, 6d FOR DB>16',
+                '7. CLEAR SPACING: ≥25mm OR 1.5d',
+                '8. ALL DIMS IN mm UNLESS NOTED'
+            ];
+            
+            generalNotes.forEach((note, idx) => {
+                const noteText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                noteText.setAttribute('x', '10');
+                noteText.setAttribute('y', 40 + idx * 17);
+                noteText.setAttribute('fill', '#aaa');
+                noteText.setAttribute('font-size', '10');
+                noteText.setAttribute('font-family', 'Courier New, monospace');
+                noteText.textContent = note;
+                notesGroup.appendChild(noteText);
+            });
+            
+            clonedSvg.appendChild(notesGroup);
             
             // Add required namespaces and styling
             clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
