@@ -6,66 +6,86 @@
     <title>Structural Detail - Column Reinforcement</title>
     <style>
         :root {
-            --blueprint-bg: #0e2f55;
-            --blueprint-line: rgba(255, 255, 255, 0.15);
+            --blueprint-bg: #0a244d;
+            --blueprint-grid: #1c3b6b;
             --drawing-white: #ffffff;
-            --drawing-yellow: #ffeb3b; 
-            --font-tech: 'Courier New', Courier, monospace;
+            --drawing-yellow: #ffeb3b;
+            --sidebar-bg: #f4f4f4;
+            --sidebar-text: #333;
         }
-
+        
         body {
+            background-color: var(--blueprint-bg);
             margin: 0;
             padding: 0;
-            background-color: var(--blueprint-bg);
-            background-image: 
-                linear-gradient(var(--blueprint-line) 1px, transparent 1px),
-                linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
-            background-size: 50px 50px;
+            font-family: 'Courier New', Courier, monospace; /* Font แบบพิมพ์เขียว */
             color: var(--drawing-white);
-            font-family: var(--font-tech);
             height: 100vh;
-            width: 100vw;
+            display: flex; /* ใช้ Flexbox สำหรับ Layout หลัก */
             overflow: hidden;
         }
 
-        .drawing-container {
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-            padding: 20px 40px;
-            display: grid;
-            grid-template-columns: 1fr;
-            /* grid-template-rows removed */
-            position: relative;
+        /* --- Sidebar Styles --- */
+        .sidebar {
+            width: 350px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font อ่านง่ายสำหรับ UI */
         }
 
-        .viewport {
-            grid-row: 1;
+        .sidebar h2 { margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; font-size: 1.2rem; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+        .form-group label { font-size: 0.9rem; font-weight: 600; }
+        .form-group input, .form-group select { 
+            padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; 
+        }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        
+        .section-header {
+            background: #e0e0e0;
+            padding: 5px 10px;
+            font-weight: bold;
+            margin: 10px -20px 5px -20px; /* เต็มขอบ */
+        }
+
+        /* --- Drawing Area Styles --- */
+        .drawing-container {
+            flex: 1; /* กินพื้นที่ที่เหลือ */
+            position: relative;
+            background-image: 
+                linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
+            background-size: 40px 40px; /* Grid size */
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            background: rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
+        }
+
+        .viewport {
+            width: 95%;
+            height: 95%;
         }
 
         svg {
-            width: auto;
-            height: auto;
-            max-width: 95%;
-            max-height: 95%;
-            filter: drop-shadow(0px 0px 2px rgba(0,0,0,0.5));
+            width: 100%;
+            height: 100%;
+            /* border: 1px solid rgba(255, 255, 255, 0.2); Debug border */
         }
 
-        .dim-line { stroke: var(--drawing-white); stroke-width: 0.5; opacity: 0.7; }
-        .main-bar { fill: var(--drawing-white); }
+        /* SVG Elements Styling */
+        .concrete-outline { fill: none; stroke: white; stroke-width: 2; }
         .stirrup { fill: none; stroke: var(--drawing-yellow); stroke-width: 2; }
-        .concrete-outline { fill: rgba(255,255,255,0.05); stroke: var(--drawing-white); stroke-width: 1; }
-        
-        text { fill: var(--drawing-white); font-family: var(--font-tech); font-size: 14px; }
-        .label-text { font-size: 16px; font-weight: bold; fill: var(--drawing-yellow); }
-        .sub-label { font-size: 12px; fill: #ccc; }
+        .main-bar { fill: white; stroke: none; }
+        .dim-line { stroke: white; stroke-width: 0.5; }
+        .label-text { fill: white; font-size: 14px; font-weight: bold; }
+        .sub-label { fill: #aaaaaa; font-size: 12px; }
         .view-title { font-size: 20px; font-weight: bold; text-decoration: underline; fill: var(--drawing-white); }
 
         .title-block-container {
@@ -76,219 +96,526 @@
         }
 
         .title-block {
-            border: 2px solid var(--drawing-white);
-            background: rgba(14, 47, 85, 0.95);
+            border: 2px solid white;
             padding: 15px;
-            width: 350px;
-            box-shadow: -5px -5px 0px rgba(0,0,0,0.3);
+            background: rgba(10, 36, 77, 0.9);
+            width: 300px;
+            font-size: 12px;
         }
-
-        .title-block table { width: 100%; border-collapse: collapse; }
-        .title-block td { padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.3); font-size: 12px; }
-        .title-block h3 { margin: 0 0 10px 0; font-size: 16px; color: var(--drawing-yellow); text-transform: uppercase; border-bottom: 2px solid white; padding-bottom: 5px;}
+        
+        .tb-row { display: flex; margin-bottom: 5px; }
+        .tb-label { font-weight: bold; width: 80px; flex-shrink: 0; }
+        .tb-value { flex-grow: 1; }
+        .tb-project { font-size: 14px; font-weight: bold; color: var(--drawing-yellow); margin-bottom: 10px; border-bottom: 1px solid white; padding-bottom: 5px; }
 
     </style>
 </head>
 <body>
 
-    <div class="drawing-container">
+    <!-- Sidebar Control Panel -->
+    <div class="sidebar">
+        <h2>🔧 Settings</h2>
         
-        <div class="viewport">
-            <svg viewBox="-100 -50 1400 700" preserveAspectRatio="xMidYMid meet">
-                <!-- Global Defs -->
-                <defs>
-                    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5"
-                            markerWidth="5" markerHeight="5">
-                        <circle cx="5" cy="5" r="3" fill="white"/>
-                    </marker>
-                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M0,0 L10,5 L0,10 z" fill="white"/>
-                    </marker>
-                </defs>
+        <div class="section-header">Title Block Info</div>
+        <div class="form-group">
+            <label>Project Name</label>
+            <input type="text" id="inp-project" value="CIVIL PARK INTERNATIONAL">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Dwg Title</label>
+                <input type="text" id="inp-title-val" value="COLUMN C1">
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="text" id="inp-date-val" value="18/12/2025">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Drawn By</label>
+                <input type="text" id="inp-drawn-val" value="arrkpong jerosiri">
+            </div>
+            <div class="form-group">
+                <label>Scale</label>
+                <input type="text" id="inp-scale-val" value="N.T.S.">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Note Suffix</label>
+            <input type="text" id="inp-note-val" value="ARRANGED ALONG BOUNDARY.">
+        </div>
 
-                <!-- =========================
-                     LEFT: SECTION A-A
-                     ========================= -->
-                <g id="section-view">
-                    <rect x="50" y="50" width="300" height="300" class="concrete-outline"/>
-                    
-                    <!-- Main Stirrup with Hooks (วาดเป็นเส้นเดียวต่อเนื่อง) -->
-                    <!-- เริ่มจากมุมบนซ้าย วนขวา ล่าง ซ้าย กลับมาบน แล้วงอเข้าใน 135 องศา -->
-                    <!-- Main Stirrup with Hooks (วาดเป็นเส้นเดียวต่อเนื่อง) -->
-                    <path d="M 85 70 H 322 A 8 8 0 0 1 330 78 V 322 A 8 8 0 0 1 322 330 L 305 313 M 322 330 H 78 A 8 8 0 0 1 70 322 V 78 A 8 8 0 0 1 78 70 L 95 87" 
-                        fill="none" stroke="#ffeb3b" stroke-width="2" class="stirrup"/>
-                    
-                    <!-- Main Bars (เหล็กยืน) -->
-                    <g id="main-bars">
-                        <!-- ด้านบน 5 เส้น -->
-                        <circle cx="85" cy="85" r="8" class="main-bar"/>
-                        <circle cx="142.5" cy="85" r="8" class="main-bar"/>
-                        <circle cx="200" cy="85" r="8" class="main-bar"/>
-                        <circle cx="257.5" cy="85" r="8" class="main-bar"/>
-                        <circle cx="315" cy="85" r="8" class="main-bar"/>
-    
-                        <!-- ด้านล่าง 5 เส้น -->
-                        <circle cx="85" cy="315" r="8" class="main-bar"/>
-                        <circle cx="142.5" cy="315" r="8" class="main-bar"/>
-                        <circle cx="200" cy="315" r="8" class="main-bar"/>
-                        <circle cx="257.5" cy="315" r="8" class="main-bar"/>
-                        <circle cx="315" cy="315" r="8" class="main-bar"/>
-    
-                        <!-- ด้านซ้าย 3 เส้น -->
-                        <circle cx="85" cy="142.5" r="8" class="main-bar"/>
-                        <circle cx="85" cy="200" r="8" class="main-bar"/>
-                        <circle cx="85" cy="257.5" r="8" class="main-bar"/>
-    
-                        <!-- ด้านขวา 3 เส้น -->
-                        <circle cx="315" cy="142.5" r="8" class="main-bar"/>
-                        <circle cx="315" cy="200" r="8" class="main-bar"/>
-                        <circle cx="315" cy="257.5" r="8" class="main-bar"/>
-                    </g>
-    
-                    <!-- Cross Ties (เหล็กยึดกลาง) - พร้อมตะขอ Seismic Hooks -->
-                    <g id="cross-ties" fill="none" stroke="#ffeb3b" stroke-width="2">
-                        <!-- Tie แนวตั้ง 3 เส้น (Crossties Vertical) -->
-                        <!-- V1: ตะขอบน-ล่าง (เกี่ยวเข้าใน) -->
-                        <path d="M 135 95 L 142.5 85 V 315 L 150 325" />
-                        <!-- V2: ตะขอบน-ล่าง (สลับด้าน) -->
-                        <path d="M 207.5 95 L 200 85 V 315 L 192.5 325" />
-                        <!-- V3: ตะขอบน-ล่าง -->
-                        <path d="M 250 95 L 257.5 85 V 315 L 265 325" />
-                        
-                        <!-- Tie แนวนอน 3 เส้น (Crossties Horizontal) -->
-                        <!-- H1: ตะขอซ้าย-ขวา -->
-                        <path d="M 95 135 L 85 142.5 H 315 L 325 150" />
-                        <!-- H2: ตะขอซ้าย-ขวา (สลับด้าน) -->
-                        <path d="M 95 207.5 L 85 200 H 315 L 325 192.5" />
-                        <!-- H3: ตะขอซ้าย-ขวา -->
-                        <path d="M 95 250 L 85 257.5 H 315 L 325 265" />
-                    </g>
-    
+        <div class="section-header">Dimensions (mm)</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Width (Bx)</label>
+                <input type="number" id="inp-width" value="600" step="50">
+            </div>
+            <div class="form-group">
+                <label>Depth (By)</label>
+                <input type="number" id="inp-depth" value="600" step="50">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Cover</label>
+            <input type="number" id="inp-cover" value="40">
+        </div>
 
-    
-                    <!-- Dimensions -->
-                    <g class="dimensions">
-                        <line x1="50" y1="380" x2="350" y2="380" class="dim-line"/>
-                        <line x1="50" y1="375" x2="50" y2="385" class="dim-line"/>
-                        <line x1="350" y1="375" x2="350" y2="385" class="dim-line"/>
-                        <text x="200" y="375" text-anchor="middle" font-size="18">600</text>
-    
-                        <line x1="20" y1="50" x2="20" y2="350" class="dim-line"/>
-                        <line x1="15" y1="50" x2="25" y2="50" class="dim-line"/>
-                        <line x1="15" y1="350" x2="25" y2="350" class="dim-line"/>
-                        <text x="15" y="200" text-anchor="middle" transform="rotate(-90, 15, 200)" font-size="18">600</text>
-                    </g>
-    
-                    <!-- Labels -->
-                    <line x1="315" y1="85" x2="420" y2="85" stroke="white" stroke-width="0.5" marker-start="url(#arrow)"/>
-                    <text x="425" y="90" class="label-text">16-DB25</text>
-                    <text x="425" y="105" class="sub-label">Main Bars (เหล็กยืน)</text>
-                    
-                    <line x1="330" y1="200" x2="420" y2="200" stroke="white" stroke-width="0.5" marker-start="url(#arrow)"/>
-                    <text x="425" y="205" class="label-text">DB10</text>
-                    <text x="425" y="220" class="sub-label">Main Ties (เหล็กปลอก)</text>
-    
-                    <line x1="200" y1="257.5" x2="420" y2="280" stroke="white" stroke-width="0.5" marker-start="url(#arrow)"/>
-                    <text x="425" y="285" class="label-text">DB10</text>
-                    <text x="425" y="300" class="sub-label">Cross Ties (เหล็กยึดกลาง)</text>
-    
-                    <g id="cover-label">
-                        <path d="M50 50 L-10 20" stroke="white" stroke-width="0.5" marker-start="url(#dot)"/>
-                        <line x1="-10" y1="20" x2="-70" y2="20" stroke="white" stroke-width="0.5" />
-                        <text x="-70" y="15" class="sub-label" style="fill: var(--drawing-white); font-size: 14px;">COVER 40mm</text>
-                    </g>
-    
-                    <text x="200" y="480" class="view-title" text-anchor="middle">SECTION A-A</text>
-                </g>
-
-                <!-- =========================
-                     RIGHT: ELEVATION VIEW
-                     (Shifted Right by 700 units)
-                     ========================= -->
-                <g id="elevation-view" transform="translate(700, 0)">
-                    <rect x="100" y="20" width="100" height="500" class="concrete-outline" />
-    
-                    <line x1="115" y1="20" x2="115" y2="520" stroke="white" stroke-width="3"/>
-                    <line x1="185" y1="20" x2="185" y2="520" stroke="white" stroke-width="3"/>
-                    <line x1="150" y1="20" x2="150" y2="520" stroke="white" stroke-width="1" stroke-dasharray="10 5" opacity="0.5"/>
-    
-                    <path d="M125 250 L105 250 L80 270" fill="none" stroke="white" stroke-width="1"/>
-                    <text x="75" y="285" text-anchor="end" class="sub-label">Lap Splice (50d)</text>
-    
-                    <!-- Stirrup Lines - Top -->
-                    <g stroke="#ffeb3b" stroke-width="1.5">
-                        <line x1="100" y1="40" x2="200" y2="40"/><line x1="100" y1="55" x2="200" y2="55"/><line x1="100" y1="70" x2="200" y2="70"/><line x1="100" y1="85" x2="200" y2="85"/><line x1="100" y1="100" x2="200" y2="100"/>
-                    </g>
-                    <!-- Stirrup Lines - Middle -->
-                    <g stroke="#ffeb3b" stroke-width="1.5">
-                        <line x1="100" y1="150" x2="200" y2="150"/><line x1="100" y1="200" x2="200" y2="200"/><line x1="100" y1="250" x2="200" y2="250"/><line x1="100" y1="300" x2="200" y2="300"/><line x1="100" y1="350" x2="200" y2="350"/><line x1="100" y1="400" x2="200" y2="400"/>
-                    </g>
-                    <!-- Stirrup Lines - Bottom -->
-                    <g stroke="#ffeb3b" stroke-width="1.5">
-                        <line x1="100" y1="440" x2="200" y2="440"/><line x1="100" y1="455" x2="200" y2="455"/><line x1="100" y1="470" x2="200" y2="470"/><line x1="100" y1="485" x2="200" y2="485"/><line x1="100" y1="500" x2="200" y2="500"/>
-                    </g>
-    
-                    <!-- Dimensions & Levels -->
-                    <!-- Zone 1: Top -->
-                    <line x1="220" y1="20" x2="220" y2="120" class="dim-line"/>
-                    <text x="235" y="70" class="label-text" font-size="12">@75</text>
-                    <text x="280" y="70" class="label-text" font-size="12" fill="#aaaaaa">(1000)</text> <!-- ความยาวโซน (ขยับขวา) -->
-                    
-                    <!-- Zone 2: Middle -->
-                    <line x1="220" y1="120" x2="220" y2="420" class="dim-line"/>
-                    <text x="235" y="270" class="label-text" font-size="12">@200</text>
-                    <text x="280" y="270" class="label-text" font-size="12" fill="#aaaaaa">(3000)</text> <!-- ความยาวโซน (ขยับขวา) -->
-                    
-                    <!-- Zone 3: Bottom -->
-                    <line x1="220" y1="420" x2="220" y2="520" class="dim-line"/>
-                    <text x="235" y="470" class="label-text" font-size="12">@75</text>
-                    <text x="280" y="470" class="label-text" font-size="12" fill="#aaaaaa">(1000)</text> <!-- ความยาวโซน (ขยับขวา) -->
-                    
-                    <!-- Tick Marks -->
-                    <line x1="215" y1="20" x2="225" y2="20" stroke="white"/>
-                    <line x1="215" y1="120" x2="225" y2="120" stroke="white"/>
-                    <line x1="215" y1="420" x2="225" y2="420" stroke="white"/>
-                    <line x1="215" y1="520" x2="225" y2="520" stroke="white"/>
-
-                    <!-- Level Symbols -->
-                    <!-- Top Level -->
-                    <g transform="translate(100, 20)">
-                       <line x1="-20" y1="0" x2="120" y2="0" stroke="white" stroke-dasharray="5 3"/>
-                       <path d="M-20 0 L-30 -10 H-50 V10 H-30 L-20 0" fill="none" stroke="white"/>
-                       <text x="-55" y="5" text-anchor="end" class="sub-label" font-size="12">FL +3.50</text>
-                    </g>
-                    <!-- Bottom Level -->
-                    <g transform="translate(100, 520)">
-                       <line x1="-20" y1="0" x2="120" y2="0" stroke="white" stroke-dasharray="5 3"/>
-                       <path d="M-20 0 L-30 -10 H-50 V10 H-30 L-20 0" fill="none" stroke="white"/>
-                       <text x="-55" y="5" text-anchor="end" class="sub-label" font-size="12">FL +0.00</text>
-                    </g>
-    
-                    <text x="175" y="580" class="view-title" text-anchor="middle">ELEVATION VIEW</text>
-                </g>
-            </svg>
-
-        <div class="title-block-container">
-            <div class="title-block">
-                <h3>PROJECT: CIVIL PARK INTERNATIONAL</h3>
-                <table>
-                    <tr>
-                        <td><strong>DWG TITLE:</strong> COLUMN C1</td>
-                        <td><strong>DATE:</strong> 17/12/2025</td>
-                    </tr>
-                    <tr>
-                        <td><strong>DRAWN BY:</strong> arrkpong jerosiri</td>
-                        <td><strong>SCALE:</strong> N.T.S.</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><strong>NOTE:</strong> 16-DB25 ARRANGED ALONG BOUNDARY.</td>
-                    </tr>
-                </table>
+        <div class="section-header">Main Bars (เหล็กยืน)</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Info</label>
+                <input type="text" id="inp-main-size" value="DB25">
+            </div>
+            <div class="form-group">
+                <label>Total Count</label>
+                <input type="number" id="inp-main-count" value="16" readonly title="Calculated from X/Y">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Bars X-Dir</label>
+                <input type="number" id="inp-nx" value="5" min="2">
+            </div>
+            <div class="form-group">
+                <label>Bars Y-Dir</label>
+                <input type="number" id="inp-ny" value="5" min="2">
             </div>
         </div>
 
+        <div class="section-header">Stirrups (เหล็กปลอก)</div>
+        <div class="form-group">
+            <label>Size</label>
+            <input type="text" id="inp-tie-size" value="DB10">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Spacing Zone</label>
+                <input type="number" id="inp-s-zone" value="75">
+            </div>
+            <div class="form-group">
+                <label>Spacing Mid</label>
+                <input type="number" id="inp-s-mid" value="200">
+            </div>
+        </div>
     </div>
 
+    <!-- Drawing Area -->
+    <div class="drawing-container">
+        <div class="viewport">
+            <svg id="main-svg" viewBox="-100 -50 1400 700" preserveAspectRatio="xMidYMid meet">
+                <!-- Content will be generated by JS -->
+            </svg>
+        </div>
+
+        <div class="title-block-container">
+            <div class="title-block">
+                <div class="tb-project"><span id="lbl-project">PROJECT</span>: <span id="tb-project">...</span></div>
+                <div class="tb-row">
+                    <span class="tb-label"><span id="lbl-title">DWG TITLE</span>:</span>
+                    <span class="tb-value" id="tb-title">...</span>
+                    <span class="tb-label" style="width: 40px;">DATE:</span>
+                    <span class="tb-value" id="tb-date">...</span>
+                </div>
+                <div class="tb-row">
+                    <span class="tb-label"><span id="lbl-drawn">DRAWN BY</span>:</span>
+                    <span class="tb-value" id="tb-drawn-val">...</span>
+                    <span class="tb-label" style="width: 40px;">SCALE:</span>
+                    <span class="tb-value" id="tb-scale">...</span>
+                </div>
+                <div class="tb-row">
+                    <span class="tb-label"><span id="lbl-note">NOTE</span>:</span>
+                    <span class="tb-value" id="tb-note">...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration & State ---
+        const svg = document.getElementById('main-svg');
+        const state = {
+            project: '', colName: '', engineer: '',
+            width: 0, depth: 0, cover: 0,
+            mainSize: '', nx: 0, ny: 0,
+            tieSize: '', sZone: 0, sMid: 0
+        };
+
+        // --- DOM Elements ---
+        const inputs = {
+            project: document.getElementById('inp-project'),
+            width: document.getElementById('inp-width'),
+            depth: document.getElementById('inp-depth'),
+            cover: document.getElementById('inp-cover'),
+            mainSize: document.getElementById('inp-main-size'),
+            nx: document.getElementById('inp-nx'),
+            ny: document.getElementById('inp-ny'),
+            tieSize: document.getElementById('inp-tie-size'),
+            sZone: document.getElementById('inp-s-zone'),
+            sMid: document.getElementById('inp-s-mid'),
+            mainCountDisplay: document.getElementById('inp-main-count'),
+            mainCountDisplay: document.getElementById('inp-main-count'),
+            // Inputs for Values
+            titleVal: document.getElementById('inp-title-val'),
+            dateVal: document.getElementById('inp-date-val'),
+            drawnVal: document.getElementById('inp-drawn-val'),
+            scaleVal: document.getElementById('inp-scale-val'),
+            noteVal: document.getElementById('inp-note-val')
+        };
+
+        // --- Initialization ---
+        function init() {
+            // Attach event listeners
+            Object.values(inputs).forEach(inp => {
+                if(inp) inp.addEventListener('input', updateDrawing);
+            });
+            updateDrawing();
+        }
+
+        // --- Main Update Function ---
+        function updateDrawing() {
+            try {
+                // 1. Read Inputs with Fallbacks
+                state.project = inputs.project ? inputs.project.value : "";
+                state.width = (inputs.width ? parseFloat(inputs.width.value) : 600) || 600;
+                state.depth = (inputs.depth ? parseFloat(inputs.depth.value) : 600) || 600;
+                state.cover = (inputs.cover ? parseFloat(inputs.cover.value) : 40) || 40;
+                state.mainSize = inputs.mainSize ? inputs.mainSize.value : "DB25";
+                state.nx = (inputs.nx ? parseInt(inputs.nx.value) : 2) || 2;
+                state.ny = (inputs.ny ? parseInt(inputs.ny.value) : 2) || 2;
+                state.tieSize = inputs.tieSize ? inputs.tieSize.value : "DB10";
+                state.sZone = (inputs.sZone ? parseFloat(inputs.sZone.value) : 75) || 75;
+                state.sMid = (inputs.sMid ? parseFloat(inputs.sMid.value) : 200) || 200;
+
+                // Update Calculated Fields
+                const totalBars = 2 * state.nx + 2 * (state.ny - 2); 
+                if(inputs.mainCountDisplay) inputs.mainCountDisplay.value = totalBars;
+
+                // 2. Update Title Block (Values)
+                const valTitle = inputs.titleVal ? inputs.titleVal.value : "";
+                const valDate = inputs.dateVal ? inputs.dateVal.value : "";
+                const valDrawn = inputs.drawnVal ? inputs.drawnVal.value : "";
+                const valScale = inputs.scaleVal ? inputs.scaleVal.value : "";
+                const valNote = inputs.noteVal ? inputs.noteVal.value : "";
+
+                const elTbProject = document.getElementById('tb-project');
+                const elTbTitle = document.getElementById('tb-title');
+                const elTbDate = document.getElementById('tb-date');
+                const elTbDrawn = document.getElementById('tb-drawn-val');
+                const elTbScale = document.getElementById('tb-scale');
+                const elTbNote = document.getElementById('tb-note');
+
+                if (elTbProject) elTbProject.textContent = state.project.toUpperCase();
+                if (elTbTitle) elTbTitle.textContent = valTitle.toUpperCase();
+                if (elTbDate) elTbDate.textContent = valDate;
+                if (elTbDrawn) elTbDrawn.textContent = valDrawn;
+                if (elTbScale) elTbScale.textContent = valScale;
+                if (elTbNote) elTbNote.textContent = `${totalBars}-${state.mainSize} ${valNote}`;
+
+                // 3. Clear SVG
+                svg.innerHTML = '';
+                
+                // 4. Add Defs
+                addDefs();
+
+                // 5. Draw Views
+                drawSectionView();
+                drawElevationView();
+            } catch (err) {
+                console.error("Error updating drawing:", err);
+            }
+        }
+
+
+        function addDefs() {
+            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            defs.innerHTML = `
+                <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                    <circle cx="5" cy="5" r="3" fill="#00FFFF"/>
+                </marker>
+                <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#00FFFF"/>
+                </marker>
+            `;
+            svg.appendChild(defs);
+        }
+
+        // --- Drawing Helpers ---
+        function createEl(type, attrs) {
+            const el = document.createElementNS("http://www.w3.org/2000/svg", type);
+            for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+            return el;
+        }
+
+        function drawSectionView() {
+            const group = createEl('g', { id: 'section-view' });
+            
+            // Scale Factor: let's map input dimensions to drawing units
+            // Assuming 1 unit = 1 pixel for simplicity in this ViewBox
+            // Center the column at (200, 200) locally
+            const startX = 50; 
+            const startY = 50;
+            // Scale: 600mm -> 300px => ratio = 0.5
+            const scale = 0.5;
+            const w = state.width * scale;
+            const h = state.depth * scale;
+            const cvr = state.cover * scale; // cover in dwg units
+
+            // 1. Concrete Outline
+            const concrete = createEl('rect', {
+                x: startX, y: startY, width: w, height: h,
+                class: 'concrete-outline'
+            });
+            group.appendChild(concrete);
+
+            // 2. Main Stirrup
+            // Inset by cover
+            const stX = startX + cvr;
+            const stY = startY + cvr;
+            const stW = w - 2*cvr;
+            const stH = h - 2*cvr;
+            const r = 8; // corner radius
+
+            // Complex path for stirrup with hooks
+            // Simplified logic: Rect path + hooks
+            // Corners: TL(stX, stY), TR(stX+stW, stY), BR(stX+stW, stY+stH), BL(stX, stY+stH)
+            
+            // Hook Length
+            const hkL = 20; 
+            
+            let d = `M ${stX+15} ${stY} H ${stX+stW-r} A ${r} ${r} 0 0 1 ${stX+stW} ${stY+r} V ${stY+stH-r} A ${r} ${r} 0 0 1 ${stX+stW-r} ${stY+stH}`;
+            // Hook BR (Inward)
+            d += ` L ${stX+stW-hkL} ${stY+stH-hkL} M ${stX+stW-r} ${stY+stH}`; // Fake hook visually
+            
+            d += ` H ${stX+r} A ${r} ${r} 0 0 1 ${stX} ${stY+stH-r} V ${stY+r} A ${r} ${r} 0 0 1 ${stX+r} ${stY}`;
+            // Hook TL
+            d += ` L ${stX+hkL} ${stY+hkL}`;
+
+            const stirrup = createEl('path', {
+                d: d,
+                fill: 'none', stroke: '#ffeb3b', 'stroke-width': 2
+            });
+            group.appendChild(stirrup);
+
+            // 3. Main Bars
+            // Calculate positions
+            // X-spacing: (stW) / (nx - 1)
+            // Y-spacing: (stH) / (ny - 1)
+            const sx = stW / (state.nx - 1);
+            const sy = stH / (state.ny - 1);
+            
+            const barGroup = createEl('g', { id: 'main-bars' });
+            
+            // Draw Top and Bottom rows
+            for(let i=0; i<state.nx; i++) {
+                const cx = stX + i*sx;
+                // Top
+                barGroup.appendChild(createEl('circle', { cx: cx, cy: stY, r: 8, class: 'main-bar' }));
+                // Bottom
+                barGroup.appendChild(createEl('circle', { cx: cx, cy: stY+stH, r: 8, class: 'main-bar' }));
+            }
+            // Draw Side rows (exclude corners)
+            for(let j=1; j<state.ny-1; j++) {
+                const cy = stY + j*sy;
+                // Left
+                barGroup.appendChild(createEl('circle', { cx: stX, cy: cy, r: 8, class: 'main-bar' }));
+                // Right
+                barGroup.appendChild(createEl('circle', { cx: stX+stW, cy: cy, r: 8, class: 'main-bar' }));
+            }
+            group.appendChild(barGroup);
+            
+            // 4. Cross Ties (Simplified Logic: Connect opposing bars if > 2x2)
+            // Vertical Ties (connect top-bottom) for internal cols
+            const tieGroup = createEl('g', { id: 'cross-ties', fill: 'none', stroke: '#ffeb3b', 'stroke-width': 2 });
+            
+            // Vertical Crossties (skip outer cols 0 and nx-1)
+            for(let i=1; i<state.nx-1; i++) {
+                 const cx = stX + i*sx;
+                 const topY = stY + 10;
+                 const botY = stY + stH - 10;
+                 // Draw line with hooks
+                 let path = `M ${cx-10} ${topY+10} L ${cx} ${topY} V ${botY} L ${cx+10} ${botY-10}`; // S-hook shape roughly
+                 tieGroup.appendChild(createEl('path', { d: path }));
+            }
+             // Horizontal Crossties (skip outer rows 0 and ny-1)
+             for(let j=1; j<state.ny-1; j++) {
+                 const cy = stY + j*sy;
+                 const leftX = stX + 10;
+                 const rightX = stX + stW - 10;
+                 let path = `M ${leftX+10} ${cy-10} L ${leftX} ${cy} H ${rightX} L ${rightX-10} ${cy+10}`;
+                 tieGroup.appendChild(createEl('path', { d: path }));
+            }
+            group.appendChild(tieGroup);
+
+            // 5. Labels & Dimensions (Dynamic positions)
+            // Top Dimension - Width
+            group.appendChild(createEl('line', { x1: startX, y1: startY-20, x2: startX+w, y2: startY-20, class: 'dim-line' })); // Main line
+            group.appendChild(createEl('line', { x1: startX, y1: startY-25, x2: startX, y2: startY-15, class: 'dim-line' })); // L tick
+            group.appendChild(createEl('line', { x1: startX+w, y1: startY-25, x2: startX+w, y2: startY-15, class: 'dim-line' })); // R tick
+            // Text center
+            const textW = createEl('text', { x: startX + w/2, y: startY-30, 'text-anchor': 'middle', class: 'label-text' });
+            textW.textContent = state.width;
+            group.appendChild(textW);
+
+            // Side Dimension - Depth
+            group.appendChild(createEl('line', { x1: startX-20, y1: startY, x2: startX-20, y2: startY+h, class: 'dim-line' })); 
+            group.appendChild(createEl('line', { x1: startX-25, y1: startY, x2: startX-15, y2: startY, class: 'dim-line' })); 
+            group.appendChild(createEl('line', { x1: startX-25, y1: startY+h, x2: startX-15, y2: startY+h, class: 'dim-line' })); 
+            const textH = createEl('text', { 
+                x: startX-30, y: startY + h/2, 'text-anchor': 'middle', 
+                transform: `rotate(-90, ${startX-30}, ${startY + h/2})`, class: 'label-text' 
+            });
+            textH.textContent = state.depth;
+            group.appendChild(textH);
+
+            // Leader Lines & Text
+            const lx1 = startX + w - 30; // Pointing to top right bar roughly
+            const ly1 = startY + 20;
+            const lx2 = startX + w + 80;
+            const ly2 = startY + 20;
+            
+            // Rebar Label (Main Bars)
+            group.appendChild(createEl('line', { x1: lx1, y1: ly1, x2: lx2, y2: ly2, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' }));
+            const labelRebar = createEl('text', { x: lx2 + 5, y: ly2+5, class: 'label-text' });
+            const total = (2*state.nx + 2*(state.ny-2));
+            labelRebar.textContent = `${total}-${state.mainSize}`;
+            group.appendChild(labelRebar);
+            const subLabelRebar = createEl('text', { x: lx2 + 5, y: ly2+20, class: 'sub-label' });
+            subLabelRebar.textContent = "Main Bars";
+            group.appendChild(subLabelRebar);
+
+            // Main Ties Label (ชี้ที่เหล็กปลอก)
+            // ชี้ไปที่ขาปลอกด้านขวา (stX + stW) = startX + w - state.cover
+            const ty1 = startY + h/2; // กลางเสา
+            const tx1 = startX + w - state.cover;   // ขอบขวาปลอก (ลบ cover ออก)
+            const tx2 = startX + w + 80; // ปลายเส้น Leader
+            
+            group.appendChild(createEl('line', { x1: tx1, y1: ty1, x2: tx2, y2: ty1, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' }));
+            const labelTie = createEl('text', { x: tx2 + 5, y: ty1 + 5, class: 'label-text' });
+            labelTie.textContent = state.tieSize;
+            group.appendChild(labelTie);
+            const subLabelTie = createEl('text', { x: tx2 + 5, y: ty1 + 20, class: 'sub-label' });
+            subLabelTie.textContent = "Main Ties";
+            group.appendChild(subLabelTie);
+
+            // Cross Ties Label (ชี้ที่เหล็กยึดกลาง - ถ้ามี)
+            if (state.nx > 2 || state.ny > 2) {
+                const cy1 = startY + h/2 + 40; // ต่ำลงมาหน่อย
+                // ชี้ไปที่เส้น Cross Tie แนวนอนเส้นกลางๆ (ประมาณกลางเสา)
+                const cx1 = startX + w/2; 
+                const cx2 = startX + w + 80;
+                
+                // วาดเส้นจากกลางเสาออกมา (อาจจะทับเส้นอื่นบ้างแต่ให้เห็นภาพ)
+                group.appendChild(createEl('line', { x1: cx1, y1: cy1, x2: cx2, y2: cy1 + 20, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#arrow)' }));
+                
+                const labelCross = createEl('text', { x: cx2 + 5, y: cy1 + 25, class: 'label-text' });
+                labelCross.textContent = state.tieSize;
+                group.appendChild(labelCross);
+                const subLabelCross = createEl('text', { x: cx2 + 5, y: cy1 + 40, class: 'sub-label' });
+                subLabelCross.textContent = "Cross Ties";
+                group.appendChild(subLabelCross);
+            }
+
+            // Cover Label
+            // ชี้จากมุมบนซ้าย (Concrete Outline)
+            group.appendChild(createEl('path', { d:`M ${startX} ${startY} L ${startX-40} ${startY-30}`, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#dot)' }));
+            group.appendChild(createEl('line', { x1: startX-40, y1: startY-30, x2: startX-100, y2: startY-30, stroke:'#00FFFF', 'stroke-width':0.5 }));
+            const labelCover = createEl('text', { x: startX-100, y: startY-35, class: 'sub-label' });
+            labelCover.textContent = `COVER ${state.cover}mm`;
+            group.appendChild(labelCover);
+
+            // View Title
+            const title = createEl('text', { x: startX + w/2, y: startY + h + 60, 'text-anchor': 'middle', class: 'view-title' });
+            title.textContent = "SECTION A-A";
+            group.appendChild(title);
+
+            svg.appendChild(group);
+        }
+
+        function drawElevationView() {
+            const group = createEl('g', { id: 'elevation-view', transform: 'translate(700, 0)' });
+            
+            // Fixed illustrative height for elevation: 500px representing 5m
+            const H = 500; 
+            const W = 100; // Fixed visual width for simplicity
+            const startX = 100;
+            const startY = 20;
+
+            // 1. Concrete
+            group.appendChild(createEl('rect', { x: startX, y: startY, width: W, height: H, class: 'concrete-outline' }));
+            
+            // 2. Main Bars (Lines)
+            group.appendChild(createEl('line', { x1: startX+15, y1: startY, x2: startX+15, y2: startY+H, stroke:'white', 'stroke-width':3 }));
+            group.appendChild(createEl('line', { x1: startX+W-15, y1: startY, x2: startX+W-15, y2: startY+H, stroke:'white', 'stroke-width':3 }));
+            // Center dashed
+            group.appendChild(createEl('line', { x1: startX+W/2, y1: startY, x2: startX+W/2, y2: startY+H, stroke:'white', 'stroke-width':1, 'stroke-dasharray':'10 5', opacity:0.5 }));
+
+            // Lap Splice Marker
+            const spliceY = startY + H/2 + 20; // ประมาณกลางๆ ค่อนล่างนิดหน่อย
+            const splicePath = `M ${startX+15} ${spliceY} L ${startX-10} ${spliceY} L ${startX-30} ${spliceY+20}`;
+            group.appendChild(createEl('path', { d: splicePath, fill:'none', stroke:'white', 'stroke-width':1 }));
+            const labelSplice = createEl('text', { x: startX-35, y: spliceY+25, 'text-anchor': 'end', class: 'sub-label' });
+            labelSplice.textContent = "Lap Splice (50d)";
+            group.appendChild(labelSplice);
+
+            // 3. Stirrups Lines
+            // Zone Ht ~ 1m -> 100px visual
+            const zH = 100; 
+            // Draw Zone Top
+            const gTop = createEl('g', { stroke:'#ffeb3b', 'stroke-width':1.5 });
+            for(let y=startY+10; y < startY+zH; y+=15) {
+                gTop.appendChild(createEl('line', { x1: startX, y1: y, x2: startX+W, y2: y }));
+            }
+            group.appendChild(gTop);
+            
+            // Draw Middle
+            const gMid = createEl('g', { stroke:'#ffeb3b', 'stroke-width':1.5 });
+            for(let y=startY+zH+20; y < startY+H-zH; y+=40) { // wider visual spacing
+                gMid.appendChild(createEl('line', { x1: startX, y1: y, x2: startX+W, y2: y }));
+            }
+            group.appendChild(gMid);
+
+            // Draw Zone Bottom
+            const gBot = createEl('g', { stroke:'#ffeb3b', 'stroke-width':1.5 });
+            for(let y=startY+H-zH+10; y < startY+H; y+=15) {
+                gBot.appendChild(createEl('line', { x1: startX, y1: y, x2: startX+W, y2: y }));
+            }
+            group.appendChild(gBot);
+
+
+            // 4. Dimensions & Labels
+            const dX = startX + W + 20;
+            // Top Zone
+            group.appendChild(createEl('line', { x1: dX, y1: startY, x2: dX, y2: startY+zH, class: 'dim-line' }));
+            group.appendChild(createEl('text', { x: dX+10, y: startY + zH/2, class:'label-text', fill:'white' })).textContent = `@${state.sZone}`;
+            group.appendChild(createEl('text', { x: dX+60, y: startY + zH/2, class:'label-text', fill:'#aaa' })).textContent = `(1000)`;
+
+            // Mid Zone
+            group.appendChild(createEl('line', { x1: dX, y1: startY+zH, x2: dX, y2: startY+H-zH, class: 'dim-line' }));
+            group.appendChild(createEl('text', { x: dX+10, y: startY + H/2, class:'label-text', fill:'white' })).textContent = `@${state.sMid}`;
+            group.appendChild(createEl('text', { x: dX+60, y: startY + H/2, class:'label-text', fill:'#aaa' })).textContent = `(3000)`;
+
+             // Bot Zone
+             group.appendChild(createEl('line', { x1: dX, y1: startY+H-zH, x2: dX, y2: startY+H, class: 'dim-line' }));
+             group.appendChild(createEl('text', { x: dX+10, y: startY + H - zH/2, class:'label-text', fill:'white' })).textContent = `@${state.sZone}`;
+             group.appendChild(createEl('text', { x: dX+60, y: startY + H - zH/2, class:'label-text', fill:'#aaa' })).textContent = `(1000)`;
+
+             // Ticks
+             [startY, startY+zH, startY+H-zH, startY+H].forEach(y => {
+                 group.appendChild(createEl('line', { x1: dX-5, y1: y, x2: dX+5, y2:y, stroke:'white' }));
+             });
+
+            // View Title
+            const title = createEl('text', { x: startX + W/2, y: startY + H + 60, 'text-anchor': 'middle', class: 'view-title' });
+            title.textContent = "ELEVATION VIEW";
+            group.appendChild(title);
+
+            svg.appendChild(group);
+        }
+
+        // Start
+        init();
+    </script>
 </body>
 </html>
