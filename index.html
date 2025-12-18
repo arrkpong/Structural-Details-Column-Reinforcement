@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Detail - Column Reinforcement</title>
+    <style>
+        :root {
+            --blueprint-bg: #0e2f55;
+            --blueprint-line: rgba(255, 255, 255, 0.15);
+            --drawing-white: #ffffff;
+            --drawing-yellow: #ffeb3b; 
+            --font-tech: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--blueprint-bg);
+            background-image: 
+                linear-gradient(var(--blueprint-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+            background-size: 50px 50px;
+            color: var(--drawing-white);
+            font-family: var(--font-tech);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .drawing-container {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px 40px;
+            display: grid;
+            grid-template-columns: 1fr;
+            /* grid-template-rows removed */
+            position: relative;
+        }
+
+        .viewport {
+            grid-row: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        svg {
+            width: auto;
+            height: auto;
+            max-width: 95%;
+            max-height: 95%;
+            filter: drop-shadow(0px 0px 2px rgba(0,0,0,0.5));
+        }
+
+        .dim-line { stroke: var(--drawing-white); stroke-width: 0.5; opacity: 0.7; }
+        .main-bar { fill: var(--drawing-white); }
+        .stirrup { fill: none; stroke: var(--drawing-yellow); stroke-width: 2; }
+        .concrete-outline { fill: rgba(255,255,255,0.05); stroke: var(--drawing-white); stroke-width: 1; }
+        
+        text { fill: var(--drawing-white); font-family: var(--font-tech); font-size: 14px; }
+        .label-text { font-size: 16px; font-weight: bold; fill: var(--drawing-yellow); }
+        .sub-label { font-size: 12px; fill: #ccc; }
+        .view-title { font-size: 20px; font-weight: bold; text-decoration: underline; fill: var(--drawing-white); }
+
+        .title-block-container {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            z-index: 10;
+        }
+
+        .title-block {
+            border: 2px solid var(--drawing-white);
+            background: rgba(14, 47, 85, 0.95);
+            padding: 15px;
+            width: 350px;
+            box-shadow: -5px -5px 0px rgba(0,0,0,0.3);
+        }
+
+        .title-block table { width: 100%; border-collapse: collapse; }
+        .title-block td { padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.3); font-size: 12px; }
+        .title-block h3 { margin: 0 0 10px 0; font-size: 16px; color: var(--drawing-yellow); text-transform: uppercase; border-bottom: 2px solid white; padding-bottom: 5px;}
+
+    </style>
+</head>
+<body>
+
+    <div class="drawing-container">
+        
+        <div class="viewport">
+            <svg viewBox="-100 -50 1400 700" preserveAspectRatio="xMidYMid meet">
+                <!-- Global Defs -->
+                <defs>
+                    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5"
+                            markerWidth="5" markerHeight="5">
+                        <circle cx="5" cy="5" r="3" fill="white"/>
+                    </marker>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="white"/>
+                    </marker>
+                </defs>
+
+                <!-- =========================
+                     LEFT: SECTION A-A
+                     ========================= -->
+                <g id="section-view">
+                    <rect x="50" y="50" width="300" height="300" class="concrete-outline"/>
+                    
+                    <!-- Main Stirrup with Hooks (วาดเป็นเส้นเดียวต่อเนื่อง) -->
+                    <!-- เริ่มจากมุมบนซ้าย วนขวา ล่าง ซ้าย กลับมาบน แล้วงอเข้าใน 135 องศา -->
+                    <!-- Main Stirrup with Hooks (วาดเป็นเส้นเดียวต่อเนื่อง) -->
+                    <path d="M 85 70 H 322 A 8 8 0 0 1 330 78 V 322 A 8 8 0 0 1 322 330 L 305 313 M 322 330 H 78 A 8 8 0 0 1 70 322 V 78 A 8 8 0 0 1 78 70 L 95 87" 
+                        fill="none" stroke="#ffeb3b" stroke-width="2" class="stirrup"/>
+                    
+                    <!-- Main Bars (เหล็กยืน) -->
+                    <g id="main-bars">
+                        <!-- ด้านบน 5 เส้น -->
+                        <circle cx="85" cy="85" r="8" class="main-bar"/>
+                        <circle cx="142.5" cy="85" r="8" class="main-bar"/>
+                        <circle cx="200" cy="85" r="8" class="main-bar"/>
+                        <circle cx="257.5" cy="85" r="8" class="main-bar"/>
+                        <circle cx="315" cy="85" r="8" class="main-bar"/>
+    
+                        <!-- ด้านล่าง 5 เส้น -->
+                        <circle cx="85" cy="315" r="8" class="main-bar"/>
+                        <circle cx="142.5" cy="315" r="8" class="main-bar"/>
+                        <circle cx="200" cy="315" r="8" class="main-bar"/>
+                        <circle cx="257.5" cy="315" r="8" class="main-bar"/>
+                        <circle cx="315" cy="315" r="8" class="main-bar"/>
+    
+                        <!-- ด้านซ้าย 3 เส้น -->
+                        <circle cx="85" cy="142.5" r="8" class="main-bar"/>
+                        <circle cx="85" cy="200" r="8" class="main-bar"/>
+                        <circle cx="85" cy="257.5" r="8" class="main-bar"/>
+    
+                        <!-- ด้านขวา 3 เส้น -->
+                        <circle cx="315" cy="142.5" r="8" class="main-bar"/>
+                        <circle cx="315" cy="200" r="8" class="main-bar"/>
+                        <circle cx="315" cy="257.5" r="8" class="main-bar"/>
+                    </g>
+    
+                    <!-- Cross Ties (เหล็กยึดกลาง) - พร้อมตะขอ Seismic Hooks -->
+                    <g id="cross-ties" fill="none" stroke="#ffeb3b" stroke-width="2">
+                        <!-- Tie แนวตั้ง 3 เส้น (Crossties Vertical) -->
+                        <!-- V1: ตะขอบน-ล่าง (เกี่ยวเข้าใน) -->
+                        <path d="M 135 95 L 142.5 85 V 315 L 150 325" />
+                        <!-- V2: ตะขอบน-ล่าง (สลับด้าน) -->
+                        <path d="M 207.5 95 L 200 85 V 315 L 192.5 325" />
+                        <!-- V3: ตะขอบน-ล่าง -->
+                        <path d="M 250 95 L 257.5 85 V 315 L 265 325" />
+                        
+                        <!-- Tie แนวนอน 3 เส้น (Crossties Horizontal) -->
+                        <!-- H1: ตะขอซ้าย-ขวา -->
+                        <path d="M 95 135 L 85 142.5 H 315 L 325 150" />
+                        <!-- H2: ตะขอซ้าย-ขวา (สลับด้าน) -->
+                        <path d="M 95 207.5 L 85 200 H 315 L 325 192.5" />
+                        <!-- H3: ตะขอซ้าย-ขวา -->
+                        <path d="M 95 250 L 85 257.5 H 315 L 325 265" />
+                    </g>
+    
+
+    
+                    <!-- Dimensions -->
+                    <g class="dimensions">
+                        <line x1="50" y1="380" x2="350" y2="380" class="dim-line"/>
+                        <line x1="50" y1="375" x2="50" y2="385" class="dim-line"/>
+                        <line x1="350" y1="375" x2="350" y2="385" class="dim-line"/>
+                        <text x="200" y="375" text-anchor="middle" font-size="18">600</text>
+    
+                        <line x1="20" y1="50" x2="20" y2="350" class="dim-line"/>
+                        <line x1="15" y1="50" x2="25" y2="50" class="dim-line"/>
+                        <line x1="15" y1="350" x2="25" y2="350" class="dim-line"/>
+                        <text x="15" y="200" text-anchor="middle" transform="rotate(-90, 15, 200)" font-size="18">600</text>
+                    </g>
+    
+                    <!-- Labels -->
+                    <line x1="315" y1="85" x2="420" y2="85" stroke="white" stroke-width="0.5" marker-start="url(#arrow)"/>
+                    <text x="425" y="90" class="label-text">16-DB25</text>
+                    <text x="425" y="105" class="sub-label">Main Bars (เหล็กยืน)</text>
+                    
+                    <line x1="330" y1="200" x2="420" y2="200" stroke="white" stroke-width="0.5" marker-start="url(#arrow)"/>
+                    <text x="425" y="205" class="label-text">DB10</text>
+                    <text x="425" y="220" class="sub-label">Main Ties (เหล็กปลอก)</text>
+    
+                    <line x1="200" y1="257.5" x2="420" y2="280" stroke="white" stroke-width="0.5" marker-start="url(#arrow)"/>
+                    <text x="425" y="285" class="label-text">DB10</text>
+                    <text x="425" y="300" class="sub-label">Cross Ties (เหล็กยึดกลาง)</text>
+    
+                    <g id="cover-label">
+                        <path d="M50 50 L-10 20" stroke="white" stroke-width="0.5" marker-start="url(#dot)"/>
+                        <line x1="-10" y1="20" x2="-70" y2="20" stroke="white" stroke-width="0.5" />
+                        <text x="-70" y="15" class="sub-label" style="fill: var(--drawing-white); font-size: 14px;">COVER 40mm</text>
+                    </g>
+    
+                    <text x="200" y="480" class="view-title" text-anchor="middle">SECTION A-A</text>
+                </g>
+
+                <!-- =========================
+                     RIGHT: ELEVATION VIEW
+                     (Shifted Right by 700 units)
+                     ========================= -->
+                <g id="elevation-view" transform="translate(700, 0)">
+                    <rect x="100" y="20" width="100" height="500" class="concrete-outline" />
+    
+                    <line x1="115" y1="20" x2="115" y2="520" stroke="white" stroke-width="3"/>
+                    <line x1="185" y1="20" x2="185" y2="520" stroke="white" stroke-width="3"/>
+                    <line x1="150" y1="20" x2="150" y2="520" stroke="white" stroke-width="1" stroke-dasharray="10 5" opacity="0.5"/>
+    
+                    <path d="M125 250 L105 250 L80 270" fill="none" stroke="white" stroke-width="1"/>
+                    <text x="75" y="285" text-anchor="end" class="sub-label">Lap Splice (50d)</text>
+    
+                    <!-- Stirrup Lines - Top -->
+                    <g stroke="#ffeb3b" stroke-width="1.5">
+                        <line x1="100" y1="40" x2="200" y2="40"/><line x1="100" y1="55" x2="200" y2="55"/><line x1="100" y1="70" x2="200" y2="70"/><line x1="100" y1="85" x2="200" y2="85"/><line x1="100" y1="100" x2="200" y2="100"/>
+                    </g>
+                    <!-- Stirrup Lines - Middle -->
+                    <g stroke="#ffeb3b" stroke-width="1.5">
+                        <line x1="100" y1="150" x2="200" y2="150"/><line x1="100" y1="200" x2="200" y2="200"/><line x1="100" y1="250" x2="200" y2="250"/><line x1="100" y1="300" x2="200" y2="300"/><line x1="100" y1="350" x2="200" y2="350"/><line x1="100" y1="400" x2="200" y2="400"/>
+                    </g>
+                    <!-- Stirrup Lines - Bottom -->
+                    <g stroke="#ffeb3b" stroke-width="1.5">
+                        <line x1="100" y1="440" x2="200" y2="440"/><line x1="100" y1="455" x2="200" y2="455"/><line x1="100" y1="470" x2="200" y2="470"/><line x1="100" y1="485" x2="200" y2="485"/><line x1="100" y1="500" x2="200" y2="500"/>
+                    </g>
+    
+                    <!-- Dimensions & Levels -->
+                    <!-- Zone 1: Top -->
+                    <line x1="220" y1="20" x2="220" y2="120" class="dim-line"/>
+                    <text x="235" y="70" class="label-text" font-size="12">@75</text>
+                    <text x="280" y="70" class="label-text" font-size="12" fill="#aaaaaa">(1000)</text> <!-- ความยาวโซน (ขยับขวา) -->
+                    
+                    <!-- Zone 2: Middle -->
+                    <line x1="220" y1="120" x2="220" y2="420" class="dim-line"/>
+                    <text x="235" y="270" class="label-text" font-size="12">@200</text>
+                    <text x="280" y="270" class="label-text" font-size="12" fill="#aaaaaa">(3000)</text> <!-- ความยาวโซน (ขยับขวา) -->
+                    
+                    <!-- Zone 3: Bottom -->
+                    <line x1="220" y1="420" x2="220" y2="520" class="dim-line"/>
+                    <text x="235" y="470" class="label-text" font-size="12">@75</text>
+                    <text x="280" y="470" class="label-text" font-size="12" fill="#aaaaaa">(1000)</text> <!-- ความยาวโซน (ขยับขวา) -->
+                    
+                    <!-- Tick Marks -->
+                    <line x1="215" y1="20" x2="225" y2="20" stroke="white"/>
+                    <line x1="215" y1="120" x2="225" y2="120" stroke="white"/>
+                    <line x1="215" y1="420" x2="225" y2="420" stroke="white"/>
+                    <line x1="215" y1="520" x2="225" y2="520" stroke="white"/>
+
+                    <!-- Level Symbols -->
+                    <!-- Top Level -->
+                    <g transform="translate(100, 20)">
+                       <line x1="-20" y1="0" x2="120" y2="0" stroke="white" stroke-dasharray="5 3"/>
+                       <path d="M-20 0 L-30 -10 H-50 V10 H-30 L-20 0" fill="none" stroke="white"/>
+                       <text x="-55" y="5" text-anchor="end" class="sub-label" font-size="12">FL +3.50</text>
+                    </g>
+                    <!-- Bottom Level -->
+                    <g transform="translate(100, 520)">
+                       <line x1="-20" y1="0" x2="120" y2="0" stroke="white" stroke-dasharray="5 3"/>
+                       <path d="M-20 0 L-30 -10 H-50 V10 H-30 L-20 0" fill="none" stroke="white"/>
+                       <text x="-55" y="5" text-anchor="end" class="sub-label" font-size="12">FL +0.00</text>
+                    </g>
+    
+                    <text x="175" y="580" class="view-title" text-anchor="middle">ELEVATION VIEW</text>
+                </g>
+            </svg>
+
+        <div class="title-block-container">
+            <div class="title-block">
+                <h3>PROJECT: CIVIL PARK INTERNATIONAL</h3>
+                <table>
+                    <tr>
+                        <td><strong>DWG TITLE:</strong> COLUMN C1</td>
+                        <td><strong>DATE:</strong> 17/12/2025</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DRAWN BY:</strong> arrkpong jerosiri</td>
+                        <td><strong>SCALE:</strong> N.T.S.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><strong>NOTE:</strong> 16-DB25 ARRANGED ALONG BOUNDARY.</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
