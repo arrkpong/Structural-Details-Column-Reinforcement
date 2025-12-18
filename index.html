@@ -182,6 +182,16 @@
                 <input type="number" id="inp-depth" value="600" step="50">
             </div>
         </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Column Height</label>
+                <input type="number" id="inp-height" value="5000" step="100">
+            </div>
+            <div class="form-group">
+                <label>Zone Height</label>
+                <input type="number" id="inp-zone-height" value="1000" step="100">
+            </div>
+        </div>
         <div class="form-group">
             <label>Cover</label>
             <input type="number" id="inp-cover" value="40">
@@ -283,7 +293,7 @@
         const svg = document.getElementById('main-svg');
         const state = {
             project: '', colName: '', engineer: '',
-            width: 0, depth: 0, cover: 0,
+            width: 0, depth: 0, height: 0, zoneHeight: 0, cover: 0,
             concrete: '', steel: '',
             mainSize: '', nx: 0, ny: 0,
             tieSize: '', sZone: 0, sMid: 0
@@ -294,6 +304,8 @@
             project: document.getElementById('inp-project'),
             width: document.getElementById('inp-width'),
             depth: document.getElementById('inp-depth'),
+            height: document.getElementById('inp-height'),
+            zoneHeight: document.getElementById('inp-zone-height'),
             cover: document.getElementById('inp-cover'),
             concrete: document.getElementById('inp-concrete'),
             steel: document.getElementById('inp-steel'),
@@ -328,6 +340,8 @@
                 state.project = inputs.project ? inputs.project.value : "";
                 state.width = (inputs.width ? parseFloat(inputs.width.value) : 600) || 600;
                 state.depth = (inputs.depth ? parseFloat(inputs.depth.value) : 600) || 600;
+                state.height = (inputs.height ? parseFloat(inputs.height.value) : 5000) || 5000;
+                state.zoneHeight = (inputs.zoneHeight ? parseFloat(inputs.zoneHeight.value) : 1000) || 1000;
                 state.cover = (inputs.cover ? parseFloat(inputs.cover.value) : 40) || 40;
                 state.mainSize = inputs.mainSize ? inputs.mainSize.value : "DB25";
                 state.nx = (inputs.nx ? parseInt(inputs.nx.value) : 2) || 2;
@@ -641,80 +655,137 @@
         function drawElevationView() {
             const group = createEl('g', { id: 'elevation-view', transform: 'translate(700, 0)' });
             
-            // Fixed illustrative height for elevation: 500px representing 5m
+            // Dynamic scaling: map actual height to visual height
+            const totalHeight = state.height; // mm
+            const zoneH = state.zoneHeight;   // mm
+            const midH = totalHeight - 2 * zoneH;
+            
+            // Visual dimensions (fixed visual height for readability)
             const H = 500; 
-            const W = 100; // Fixed visual width for simplicity
+            const W = 100;
             const startX = 100;
             const startY = 20;
+            
+            // Calculate visual zone heights proportionally
+            const scale = H / totalHeight;
+            const zHv = zoneH * scale;  // visual zone height
+            const mHv = midH * scale;   // visual mid height
+            
+            // Parse rebar diameter from mainSize (e.g., "DB25" -> 25)
+            const rebarDia = parseInt(state.mainSize.replace(/\D/g, '')) || 25;
+            const lapLength = 50 * rebarDia; // 50d lap splice
 
-            // 1. Concrete
+            // 1. Concrete Outline
             group.appendChild(createEl('rect', { x: startX, y: startY, width: W, height: H, class: 'concrete-outline' }));
             
             // 2. Main Bars (Lines)
             group.appendChild(createEl('line', { x1: startX+15, y1: startY, x2: startX+15, y2: startY+H, stroke:'white', 'stroke-width':3 }));
             group.appendChild(createEl('line', { x1: startX+W-15, y1: startY, x2: startX+W-15, y2: startY+H, stroke:'white', 'stroke-width':3 }));
-            // Center dashed
+            // Center dashed axis
             group.appendChild(createEl('line', { x1: startX+W/2, y1: startY, x2: startX+W/2, y2: startY+H, stroke:'white', 'stroke-width':1, 'stroke-dasharray':'10 5', opacity:0.5 }));
 
-            // Lap Splice Marker
-            const spliceY = startY + H/2 + 20; // ประมาณกลางๆ ค่อนล่างนิดหน่อย
+            // Floor Level Markers (Left side)
+            const flX = startX - 60;
+            // Top Level
+            group.appendChild(createEl('line', { x1: flX, y1: startY, x2: startX, y2: startY, stroke:'white', 'stroke-width':1 }));
+            const flTop = createEl('text', { x: flX - 5, y: startY + 5, 'text-anchor': 'end', class: 'sub-label' });
+            flTop.textContent = `FL+${(totalHeight/1000).toFixed(2)}`;
+            group.appendChild(flTop);
+            
+            // Bottom Level
+            group.appendChild(createEl('line', { x1: flX, y1: startY + H, x2: startX, y2: startY + H, stroke:'white', 'stroke-width':1 }));
+            const flBot = createEl('text', { x: flX - 5, y: startY + H + 5, 'text-anchor': 'end', class: 'sub-label' });
+            flBot.textContent = 'FL+0.00';
+            group.appendChild(flBot);
+
+            // Lap Splice Marker with calculated length
+            const spliceY = startY + H/2 + 20;
             const splicePath = `M ${startX+15} ${spliceY} L ${startX-10} ${spliceY} L ${startX-30} ${spliceY+20}`;
             group.appendChild(createEl('path', { d: splicePath, fill:'none', stroke:'white', 'stroke-width':1 }));
             const labelSplice = createEl('text', { x: startX-35, y: spliceY+25, 'text-anchor': 'end', class: 'sub-label' });
-            labelSplice.textContent = "Lap Splice (50d)";
+            labelSplice.textContent = `Lap Splice 50d=${lapLength}mm`;
             group.appendChild(labelSplice);
 
             // 3. Stirrups Lines
-            // Zone Ht ~ 1m -> 100px visual
-            const zH = 100; 
             // Draw Zone Top
             const gTop = createEl('g', { stroke:'#ffeb3b', 'stroke-width':1.5 });
-            for(let y=startY+10; y < startY+zH; y+=15) {
+            const topSpacing = Math.max(8, zHv / 8); // visual spacing
+            for(let y=startY+10; y < startY+zHv; y+=topSpacing) {
                 gTop.appendChild(createEl('line', { x1: startX, y1: y, x2: startX+W, y2: y }));
             }
             group.appendChild(gTop);
             
             // Draw Middle
             const gMid = createEl('g', { stroke:'#ffeb3b', 'stroke-width':1.5 });
-            for(let y=startY+zH+20; y < startY+H-zH; y+=40) { // wider visual spacing
+            const midSpacing = Math.max(15, mHv / 8);
+            for(let y=startY+zHv+15; y < startY+H-zHv; y+=midSpacing) {
                 gMid.appendChild(createEl('line', { x1: startX, y1: y, x2: startX+W, y2: y }));
             }
             group.appendChild(gMid);
 
             // Draw Zone Bottom
             const gBot = createEl('g', { stroke:'#ffeb3b', 'stroke-width':1.5 });
-            for(let y=startY+H-zH+10; y < startY+H; y+=15) {
+            for(let y=startY+H-zHv+10; y < startY+H; y+=topSpacing) {
                 gBot.appendChild(createEl('line', { x1: startX, y1: y, x2: startX+W, y2: y }));
             }
             group.appendChild(gBot);
 
-
-            // 4. Dimensions & Labels
+            // 4. Dimensions & Labels (Right side)
             const dX = startX + W + 20;
+            
             // Top Zone
-            group.appendChild(createEl('line', { x1: dX, y1: startY, x2: dX, y2: startY+zH, class: 'dim-line' }));
-            group.appendChild(createEl('text', { x: dX+10, y: startY + zH/2, class:'label-text', fill:'white' })).textContent = `@${state.sZone}`;
-            group.appendChild(createEl('text', { x: dX+60, y: startY + zH/2, class:'label-text', fill:'#aaa' })).textContent = `(1000)`;
+            group.appendChild(createEl('line', { x1: dX, y1: startY, x2: dX, y2: startY+zHv, class: 'dim-line' }));
+            group.appendChild(createEl('text', { x: dX+10, y: startY + zHv/2, class:'label-text', fill:'white' })).textContent = `@${state.sZone}`;
+            group.appendChild(createEl('text', { x: dX+60, y: startY + zHv/2, class:'sub-label', fill:'#aaa' })).textContent = `(${zoneH})`;
 
             // Mid Zone
-            group.appendChild(createEl('line', { x1: dX, y1: startY+zH, x2: dX, y2: startY+H-zH, class: 'dim-line' }));
+            group.appendChild(createEl('line', { x1: dX, y1: startY+zHv, x2: dX, y2: startY+H-zHv, class: 'dim-line' }));
             group.appendChild(createEl('text', { x: dX+10, y: startY + H/2, class:'label-text', fill:'white' })).textContent = `@${state.sMid}`;
-            group.appendChild(createEl('text', { x: dX+60, y: startY + H/2, class:'label-text', fill:'#aaa' })).textContent = `(3000)`;
+            group.appendChild(createEl('text', { x: dX+60, y: startY + H/2, class:'sub-label', fill:'#aaa' })).textContent = `(${midH})`;
 
-             // Bot Zone
-             group.appendChild(createEl('line', { x1: dX, y1: startY+H-zH, x2: dX, y2: startY+H, class: 'dim-line' }));
-             group.appendChild(createEl('text', { x: dX+10, y: startY + H - zH/2, class:'label-text', fill:'white' })).textContent = `@${state.sZone}`;
-             group.appendChild(createEl('text', { x: dX+60, y: startY + H - zH/2, class:'label-text', fill:'#aaa' })).textContent = `(1000)`;
+            // Bot Zone
+            group.appendChild(createEl('line', { x1: dX, y1: startY+H-zHv, x2: dX, y2: startY+H, class: 'dim-line' }));
+            group.appendChild(createEl('text', { x: dX+10, y: startY + H - zHv/2, class:'label-text', fill:'white' })).textContent = `@${state.sZone}`;
+            group.appendChild(createEl('text', { x: dX+60, y: startY + H - zHv/2, class:'sub-label', fill:'#aaa' })).textContent = `(${zoneH})`;
 
-             // Ticks
-             [startY, startY+zH, startY+H-zH, startY+H].forEach(y => {
-                 group.appendChild(createEl('line', { x1: dX-5, y1: y, x2: dX+5, y2:y, stroke:'white' }));
-             });
+            // Ticks
+            [startY, startY+zHv, startY+H-zHv, startY+H].forEach(y => {
+                group.appendChild(createEl('line', { x1: dX-5, y1: y, x2: dX+5, y2:y, stroke:'white' }));
+            });
 
-            // View Title
-            const title = createEl('text', { x: startX + W/2, y: startY + H + 60, 'text-anchor': 'middle', class: 'view-title' });
-            title.textContent = "ELEVATION VIEW";
-            group.appendChild(title);
+            // Total Height Dimension (far right)
+            const dX2 = dX + 110;
+            group.appendChild(createEl('line', { x1: dX2, y1: startY, x2: dX2, y2: startY+H, class: 'dim-line' }));
+            group.appendChild(createEl('line', { x1: dX2-5, y1: startY, x2: dX2+5, y2: startY, stroke:'white' }));
+            group.appendChild(createEl('line', { x1: dX2-5, y1: startY+H, x2: dX2+5, y2: startY+H, stroke:'white' }));
+            const totalLabel = createEl('text', { 
+                x: dX2+10, y: startY + H/2, 
+                transform: `rotate(90, ${dX2+10}, ${startY + H/2})`,
+                'text-anchor': 'middle', class:'label-text', fill:'white' 
+            });
+            totalLabel.textContent = `TOTAL: ${totalHeight}mm`;
+            group.appendChild(totalLabel);
+
+            // View Title Block
+            const titleY = startY + H + 50;
+            const titleCenterX = startX + W/2;
+            
+            // Column Mark
+            const colMark = inputs.titleVal ? inputs.titleVal.value.toUpperCase() : 'COLUMN';
+            const markText = createEl('text', { x: titleCenterX, y: titleY, 'text-anchor': 'middle', class: 'view-title' });
+            markText.textContent = colMark;
+            group.appendChild(markText);
+            
+            // View Name
+            const viewText = createEl('text', { x: titleCenterX, y: titleY + 20, 'text-anchor': 'middle', class: 'label-text' });
+            viewText.textContent = "ELEVATION VIEW";
+            group.appendChild(viewText);
+            
+            // Scale
+            const scaleVal = inputs.scaleVal ? inputs.scaleVal.value : 'N.T.S.';
+            const scaleText = createEl('text', { x: titleCenterX, y: titleY + 35, 'text-anchor': 'middle', class: 'sub-label' });
+            scaleText.textContent = `SCALE: ${scaleVal}`;
+            group.appendChild(scaleText);
 
             svg.appendChild(group);
         }
@@ -732,8 +803,21 @@
             const blueprintGrid = getComputedStyle(document.documentElement).getPropertyValue('--blueprint-grid').trim() || '#1c3b6b';
             
             // Create background and grid pattern
-            const viewBox = clonedSvg.getAttribute('viewBox').split(' ').map(Number);
-            const [vbX, vbY, vbW, vbH] = viewBox;
+            // Expand viewBox for export to have room for title block at bottom-right
+            const origViewBox = clonedSvg.getAttribute('viewBox').split(' ').map(Number);
+            const [ovbX, ovbY, ovbW, ovbH] = origViewBox;
+            
+            // Expand viewBox: add margin on left for centering + width for title block on right
+            const leftMargin = 100; // Shift drawings to the right
+            const titleBlockWidth = 350;
+            const exportVbW = ovbW + titleBlockWidth + leftMargin;
+            const newVbX = ovbX - leftMargin;
+            clonedSvg.setAttribute('viewBox', `${newVbX} ${ovbY} ${exportVbW} ${ovbH}`);
+            
+            const vbX = newVbX;
+            const vbY = ovbY;
+            const vbW = exportVbW;
+            const vbH = ovbH;
             
             // Create defs for pattern and insert at the beginning
             let defs = clonedSvg.querySelector('defs');
@@ -782,10 +866,11 @@
             // Insert background at the beginning (after defs)
             clonedSvg.insertBefore(bgGroup, defs.nextSibling);
             
-            // --- Add Title Block to SVG ---
+            // --- Add Title Block to SVG (at bottom-right per engineering standards) ---
             const titleBlockGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             titleBlockGroup.setAttribute('id', 'title-block');
-            titleBlockGroup.setAttribute('transform', `translate(${vbX + vbW - 350}, ${vbY + vbH - 180})`);
+            // Position at bottom-right corner (standard engineering drawing placement)
+            titleBlockGroup.setAttribute('transform', `translate(${vbX + ovbW + 15}, ${vbY + vbH - 180})`);
             
             // Title block background
             const tbBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
