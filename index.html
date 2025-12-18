@@ -292,7 +292,7 @@
         // --- Configuration & State ---
         const svg = document.getElementById('main-svg');
         const state = {
-            project: '', colName: '', engineer: '',
+            project: '',
             width: 0, depth: 0, height: 0, zoneHeight: 0, cover: 0,
             concrete: '', steel: '',
             mainSize: '', nx: 0, ny: 0,
@@ -336,19 +336,19 @@
         // --- Main Update Function ---
         function updateDrawing() {
             try {
-                // 1. Read Inputs with Fallbacks
+                // 1. Read Inputs with Fallbacks and validation
                 state.project = inputs.project ? inputs.project.value : "";
-                state.width = (inputs.width ? parseFloat(inputs.width.value) : 600) || 600;
-                state.depth = (inputs.depth ? parseFloat(inputs.depth.value) : 600) || 600;
-                state.height = (inputs.height ? parseFloat(inputs.height.value) : 5000) || 5000;
-                state.zoneHeight = (inputs.zoneHeight ? parseFloat(inputs.zoneHeight.value) : 1000) || 1000;
-                state.cover = (inputs.cover ? parseFloat(inputs.cover.value) : 40) || 40;
+                state.width = Math.max(100, (inputs.width ? parseFloat(inputs.width.value) : 600) || 600);
+                state.depth = Math.max(100, (inputs.depth ? parseFloat(inputs.depth.value) : 600) || 600);
+                state.height = Math.max(1000, (inputs.height ? parseFloat(inputs.height.value) : 5000) || 5000);
+                state.zoneHeight = Math.max(100, (inputs.zoneHeight ? parseFloat(inputs.zoneHeight.value) : 1000) || 1000);
+                state.cover = Math.max(20, (inputs.cover ? parseFloat(inputs.cover.value) : 40) || 40);
                 state.mainSize = inputs.mainSize ? inputs.mainSize.value : "DB25";
-                state.nx = (inputs.nx ? parseInt(inputs.nx.value) : 2) || 2;
-                state.ny = (inputs.ny ? parseInt(inputs.ny.value) : 2) || 2;
+                state.nx = Math.max(2, (inputs.nx ? parseInt(inputs.nx.value) : 2) || 2);
+                state.ny = Math.max(2, (inputs.ny ? parseInt(inputs.ny.value) : 2) || 2);
                 state.tieSize = inputs.tieSize ? inputs.tieSize.value : "DB10";
-                state.sZone = (inputs.sZone ? parseFloat(inputs.sZone.value) : 75) || 75;
-                state.sMid = (inputs.sMid ? parseFloat(inputs.sMid.value) : 200) || 200;
+                state.sZone = Math.max(50, (inputs.sZone ? parseFloat(inputs.sZone.value) : 75) || 75);
+                state.sMid = Math.max(75, (inputs.sMid ? parseFloat(inputs.sMid.value) : 200) || 200);
 
                 // Update Calculated Fields
                 const totalBars = 2 * state.nx + 2 * (state.ny - 2); 
@@ -1042,7 +1042,7 @@
             const sepLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             sepLine.setAttribute('x1', '10');
             sepLine.setAttribute('y1', '35');
-            sepLine.setAttribute('x2', '310');
+            sepLine.setAttribute('x2', String(tbWidth - 10));
             sepLine.setAttribute('y2', '35');
             sepLine.setAttribute('stroke', 'white');
             sepLine.setAttribute('stroke-width', '1');
