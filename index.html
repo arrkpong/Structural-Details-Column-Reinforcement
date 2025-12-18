@@ -139,7 +139,7 @@
 
     <!-- Sidebar Control Panel -->
     <div class="sidebar">
-        <h2>Edit</h2>
+        <h2>Panel Control</h2>
         
         <div class="section-header">Title</div>
         <div class="form-group">
@@ -185,6 +185,18 @@
         <div class="form-group">
             <label>Cover</label>
             <input type="number" id="inp-cover" value="40">
+        </div>
+
+        <div class="section-header">Materials</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Concrete (fc')</label>
+                <input type="text" id="inp-concrete" value="28 MPa">
+            </div>
+            <div class="form-group">
+                <label>Steel (fy)</label>
+                <input type="text" id="inp-steel" value="SD40">
+            </div>
         </div>
 
         <div class="section-header">Main Bars (เหล็กยืน)</div>
@@ -272,6 +284,7 @@
         const state = {
             project: '', colName: '', engineer: '',
             width: 0, depth: 0, cover: 0,
+            concrete: '', steel: '',
             mainSize: '', nx: 0, ny: 0,
             tieSize: '', sZone: 0, sMid: 0
         };
@@ -282,6 +295,8 @@
             width: document.getElementById('inp-width'),
             depth: document.getElementById('inp-depth'),
             cover: document.getElementById('inp-cover'),
+            concrete: document.getElementById('inp-concrete'),
+            steel: document.getElementById('inp-steel'),
             mainSize: document.getElementById('inp-main-size'),
             nx: document.getElementById('inp-nx'),
             ny: document.getElementById('inp-ny'),
@@ -584,10 +599,41 @@
             labelCover.textContent = `COVER ${state.cover}mm`;
             group.appendChild(labelCover);
 
-            // View Title
-            const title = createEl('text', { x: startX + w/2, y: startY + h + 60, 'text-anchor': 'middle', class: 'view-title' });
-            title.textContent = "SECTION A-A";
-            group.appendChild(title);
+            // View Title Block - Column Mark, Section Name, Scale, Materials
+            const titleY = startY + h + 50;
+            const titleCenterX = startX + w/2;
+            
+            // Column Mark (from title input)
+            const colMark = inputs.titleVal ? inputs.titleVal.value.toUpperCase() : 'COLUMN';
+            const markText = createEl('text', { x: titleCenterX, y: titleY, 'text-anchor': 'middle', class: 'view-title' });
+            markText.textContent = colMark;
+            group.appendChild(markText);
+            
+            // Section Name
+            const sectionText = createEl('text', { x: titleCenterX, y: titleY + 20, 'text-anchor': 'middle', class: 'label-text' });
+            sectionText.textContent = "SECTION A-A";
+            group.appendChild(sectionText);
+            
+            // Scale
+            const scaleVal = inputs.scaleVal ? inputs.scaleVal.value : 'N.T.S.';
+            const scaleText = createEl('text', { x: titleCenterX, y: titleY + 35, 'text-anchor': 'middle', class: 'sub-label' });
+            scaleText.textContent = `SCALE: ${scaleVal}`;
+            group.appendChild(scaleText);
+            
+            // Material Specifications (left side of drawing)
+            const matX = startX - 30;
+            const matY = startY + h + 20;
+            
+            const concreteVal = inputs.concrete ? inputs.concrete.value : '28 MPa';
+            const steelVal = inputs.steel ? inputs.steel.value : 'SD40';
+            
+            const matLabel = createEl('text', { x: matX, y: matY, 'text-anchor': 'end', class: 'sub-label' });
+            matLabel.textContent = `CONC: fc'=${concreteVal}`;
+            group.appendChild(matLabel);
+            
+            const steelLabel = createEl('text', { x: matX, y: matY + 15, 'text-anchor': 'end', class: 'sub-label' });
+            steelLabel.textContent = `STEEL: ${steelVal}`;
+            group.appendChild(steelLabel);
 
             svg.appendChild(group);
         }
