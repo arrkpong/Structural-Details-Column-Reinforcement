@@ -18,10 +18,10 @@
             background-color: var(--blueprint-bg);
             margin: 0;
             padding: 0;
-            font-family: 'Courier New', Courier, monospace; /* Font แบบพิมพ์เขียว */
+            font-family: 'Courier New', Courier, monospace; /* Blueprint-style font */
             color: var(--drawing-white);
             height: 100vh;
-            display: flex; /* ใช้ Flexbox สำหรับ Layout หลัก */
+            display: flex; /* Use Flexbox for main layout */
             overflow: hidden;
         }
 
@@ -36,7 +36,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font อ่านง่ายสำหรับ UI */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Easy-to-read font for UI */
         }
 
         .sidebar h2 { margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; font-size: 1.2rem; }
@@ -52,12 +52,12 @@
             background: #e0e0e0;
             padding: 5px 10px;
             font-weight: bold;
-            margin: 10px -20px 5px -20px; /* เต็มขอบ */
+            margin: 10px -20px 5px -20px; /* Full width edge-to-edge */
         }
 
         /* --- Drawing Area Styles --- */
         .drawing-container {
-            flex: 1; /* กินพื้นที่ที่เหลือ */
+            flex: 1; /* Take remaining space */
             position: relative;
             background-image: 
                 linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
@@ -209,7 +209,7 @@
             </div>
         </div>
 
-        <div class="section-header">Main Bars (เหล็กยืน)</div>
+        <div class="section-header">Main Bars</div>
         <div class="form-row">
             <div class="form-group">
                 <label>Info</label>
@@ -231,7 +231,7 @@
             </div>
         </div>
 
-        <div class="section-header">Stirrups (เหล็กปลอก)</div>
+        <div class="section-header">Stirrups</div>
         <div class="form-group">
             <label>Size</label>
             <input type="text" id="inp-tie-size" value="DB10">
@@ -556,21 +556,22 @@
             const tieGroup = createEl('g', { id: 'cross-ties', fill: 'none', stroke: '#ffeb3b', 'stroke-width': 2 });
             
             // Vertical Crossties (skip outer cols 0 and nx-1)
-            for(let i=1; i<state.nx-1; i++) {
-                 const cx = stX + i*sx;
-                 const topY = stY + 10;
-                 const botY = stY + stH - 10;
-                 // Draw line with hooks
-                 let path = `M ${cx-10} ${topY+10} L ${cx} ${topY} V ${botY} L ${cx+10} ${botY-10}`; // S-hook shape roughly
-                 tieGroup.appendChild(createEl('path', { d: path }));
+            for (let i = 1; i < state.nx - 1; i++) {
+                const cx = stX + i * sx;
+                const topY = stY + 10;
+                const botY = stY + stH - 10;
+                // Draw line with hooks (S-hook shape)
+                const path = `M ${cx - 10} ${topY + 10} L ${cx} ${topY} V ${botY} L ${cx + 10} ${botY - 10}`;
+                tieGroup.appendChild(createEl('path', { d: path }));
             }
-             // Horizontal Crossties (skip outer rows 0 and ny-1)
-             for(let j=1; j<state.ny-1; j++) {
-                 const cy = stY + j*sy;
-                 const leftX = stX + 10;
-                 const rightX = stX + stW - 10;
-                 let path = `M ${leftX+10} ${cy-10} L ${leftX} ${cy} H ${rightX} L ${rightX-10} ${cy+10}`;
-                 tieGroup.appendChild(createEl('path', { d: path }));
+            
+            // Horizontal Crossties (skip outer rows 0 and ny-1)
+            for (let j = 1; j < state.ny - 1; j++) {
+                const cy = stY + j * sy;
+                const leftX = stX + 10;
+                const rightX = stX + stW - 10;
+                const path = `M ${leftX + 10} ${cy - 10} L ${leftX} ${cy} H ${rightX} L ${rightX - 10} ${cy + 10}`;
+                tieGroup.appendChild(createEl('path', { d: path }));
             }
             group.appendChild(tieGroup);
 
@@ -670,7 +671,7 @@
             }
 
             // Cover Label
-            // ชี้จากมุมบนซ้าย (Concrete Outline)
+            // Cover label pointing from top-left corner of concrete outline
             group.appendChild(createEl('path', { d:`M ${startX} ${startY} L ${startX-40} ${startY-30}`, stroke:'#00FFFF', 'stroke-width':0.5, 'marker-start':'url(#dot)' }));
             group.appendChild(createEl('line', { x1: startX-40, y1: startY-30, x2: startX-100, y2: startY-30, stroke:'#00FFFF', 'stroke-width':0.5 }));
             const labelCover = createEl('text', { x: startX-100, y: startY-35, class: 'sub-label' });
