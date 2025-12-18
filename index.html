@@ -431,34 +431,55 @@
             });
             group.appendChild(concrete);
 
-            // 2. Main Stirrup
+            // 2. Main Stirrup with 135° Hooks (per seismic detailing standards)
             // Inset by cover
             const stX = startX + cvr;
             const stY = startY + cvr;
             const stW = w - 2*cvr;
             const stH = h - 2*cvr;
-            const r = 8; // corner radius
+            const r = 8; // corner radius for bending
 
-            // Complex path for stirrup with hooks
-            // Simplified logic: Rect path + hooks
-            // Corners: TL(stX, stY), TR(stX+stW, stY), BR(stX+stW, stY+stH), BL(stX, stY+stH)
+            // Hook parameters (135° hook = 10d extension + bend)
+            const hookLen = 25; // Visual hook length
+            const hookAngle = 135 * Math.PI / 180; // 135 degrees
             
-            // Hook Length
-            const hkL = 20; 
+            // Build stirrup path: Start at top-left after hook, go clockwise
+            // Top-Left Hook (135° pointing inward-down)
+            const tlHookEndX = stX + Math.cos(hookAngle - Math.PI) * hookLen;
+            const tlHookEndY = stY + Math.sin(hookAngle - Math.PI) * hookLen;
             
-            let d = `M ${stX+15} ${stY} H ${stX+stW-r} A ${r} ${r} 0 0 1 ${stX+stW} ${stY+r} V ${stY+stH-r} A ${r} ${r} 0 0 1 ${stX+stW-r} ${stY+stH}`;
-            // Hook BR (Inward)
-            d += ` L ${stX+stW-hkL} ${stY+stH-hkL} M ${stX+stW-r} ${stY+stH}`; // Fake hook visually
+            let d = `M ${tlHookEndX} ${tlHookEndY}`;  // Hook end
+            d += ` L ${stX} ${stY}`;  // Hook to corner
+            d += ` H ${stX+stW-r}`;  // Top edge
+            d += ` A ${r} ${r} 0 0 1 ${stX+stW} ${stY+r}`;  // TR corner arc
+            d += ` V ${stY+stH-r}`;  // Right edge
+            d += ` A ${r} ${r} 0 0 1 ${stX+stW-r} ${stY+stH}`;  // BR corner arc
             
-            d += ` H ${stX+r} A ${r} ${r} 0 0 1 ${stX} ${stY+stH-r} V ${stY+r} A ${r} ${r} 0 0 1 ${stX+r} ${stY}`;
-            // Hook TL
-            d += ` L ${stX+hkL} ${stY+hkL}`;
+            // Bottom-Right Hook (135° pointing inward-up)
+            const brHookEndX = stX+stW + Math.cos(-hookAngle) * hookLen;
+            const brHookEndY = stY+stH + Math.sin(-hookAngle) * hookLen;
+            d += ` L ${brHookEndX} ${brHookEndY}`;  // Hook extension
+            d += ` M ${stX+stW-r} ${stY+stH}`;  // Return to path
+            
+            d += ` H ${stX+r}`;  // Bottom edge
+            d += ` A ${r} ${r} 0 0 1 ${stX} ${stY+stH-r}`;  // BL corner arc
+            d += ` V ${stY+r}`;  // Left edge
+            d += ` A ${r} ${r} 0 0 1 ${stX+r} ${stY}`;  // TL corner arc
+            d += ` H ${stX}`;  // Close to hook start
 
             const stirrup = createEl('path', {
                 d: d,
                 fill: 'none', stroke: '#ffeb3b', 'stroke-width': 2
             });
             group.appendChild(stirrup);
+            
+            // Hook annotation label
+            const hookLabel = createEl('text', { 
+                x: tlHookEndX - 5, y: tlHookEndY - 5, 
+                'text-anchor': 'end', class: 'sub-label', fill: '#ffeb3b' 
+            });
+            hookLabel.textContent = '135° HOOK';
+            group.appendChild(hookLabel);
 
             // 3. Main Bars
             // Calculate positions
@@ -786,6 +807,49 @@
             const scaleText = createEl('text', { x: titleCenterX, y: titleY + 35, 'text-anchor': 'middle', class: 'sub-label' });
             scaleText.textContent = `SCALE: ${scaleVal}`;
             group.appendChild(scaleText);
+            
+            // Section Cut Lines (A-A markers)
+            // Position at approximately 1/3 from top
+            const cutY = startY + H * 0.3;
+            const cutExtend = 40;
+            
+            // Left cut line with arrow
+            const cutLeftX = startX - cutExtend;
+            group.appendChild(createEl('line', { 
+                x1: cutLeftX, y1: cutY, x2: startX, y2: cutY, 
+                stroke: '#00FFFF', 'stroke-width': 1.5, 'stroke-dasharray': '8 4' 
+            }));
+            // Arrow pointing right (into section)
+            group.appendChild(createEl('path', { 
+                d: `M ${cutLeftX} ${cutY-8} L ${cutLeftX+10} ${cutY} L ${cutLeftX} ${cutY+8}`, 
+                fill: '#00FFFF', stroke: 'none' 
+            }));
+            // A label
+            const labelA1 = createEl('text', { 
+                x: cutLeftX - 5, y: cutY + 5, 
+                'text-anchor': 'end', class: 'label-text', fill: '#00FFFF' 
+            });
+            labelA1.textContent = 'A';
+            group.appendChild(labelA1);
+            
+            // Right cut line with arrow
+            const cutRightX = startX + W + cutExtend;
+            group.appendChild(createEl('line', { 
+                x1: startX + W, y1: cutY, x2: cutRightX, y2: cutY, 
+                stroke: '#00FFFF', 'stroke-width': 1.5, 'stroke-dasharray': '8 4' 
+            }));
+            // Arrow pointing left (into section)
+            group.appendChild(createEl('path', { 
+                d: `M ${cutRightX} ${cutY-8} L ${cutRightX-10} ${cutY} L ${cutRightX} ${cutY+8}`, 
+                fill: '#00FFFF', stroke: 'none' 
+            }));
+            // A label
+            const labelA2 = createEl('text', { 
+                x: cutRightX + 5, y: cutY + 5, 
+                'text-anchor': 'start', class: 'label-text', fill: '#00FFFF' 
+            });
+            labelA2.textContent = 'A';
+            group.appendChild(labelA2);
 
             svg.appendChild(group);
         }
@@ -863,21 +927,49 @@
             gridRect.setAttribute('fill', 'url(#grid)');
             bgGroup.appendChild(gridRect);
             
+            // Drawing Border/Frame (standard engineering drawing border)
+            const borderMargin = 20;
+            const borderRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            borderRect.setAttribute('x', vbX + borderMargin);
+            borderRect.setAttribute('y', vbY + borderMargin);
+            borderRect.setAttribute('width', vbW - 2 * borderMargin);
+            borderRect.setAttribute('height', vbH - 2 * borderMargin);
+            borderRect.setAttribute('fill', 'none');
+            borderRect.setAttribute('stroke', 'white');
+            borderRect.setAttribute('stroke-width', '3');
+            bgGroup.appendChild(borderRect);
+            
+            // Inner drawing area border (thinner)
+            const innerMargin = 30;
+            const innerRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            innerRect.setAttribute('x', vbX + innerMargin);
+            innerRect.setAttribute('y', vbY + innerMargin);
+            innerRect.setAttribute('width', vbW - 2 * innerMargin);
+            innerRect.setAttribute('height', vbH - 2 * innerMargin);
+            innerRect.setAttribute('fill', 'none');
+            innerRect.setAttribute('stroke', 'white');
+            innerRect.setAttribute('stroke-width', '1');
+            bgGroup.appendChild(innerRect);
+            
             // Insert background at the beginning (after defs)
             clonedSvg.insertBefore(bgGroup, defs.nextSibling);
             
             // --- Add Title Block to SVG (at bottom-right per engineering standards) ---
             const titleBlockGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             titleBlockGroup.setAttribute('id', 'title-block');
-            // Position at bottom-right corner (standard engineering drawing placement)
-            titleBlockGroup.setAttribute('transform', `translate(${vbX + ovbW + 15}, ${vbY + vbH - 180})`);
+            // Position aligned with inner border at bottom-right corner
+            const tbWidth = 320;
+            const tbHeight = 160;
+            const tbX = vbX + vbW - innerMargin - tbWidth;  // Align with inner border right
+            const tbY = vbY + vbH - innerMargin - tbHeight; // Align with inner border bottom
+            titleBlockGroup.setAttribute('transform', `translate(${tbX}, ${tbY})`);
             
             // Title block background
             const tbBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             tbBg.setAttribute('x', '0');
             tbBg.setAttribute('y', '0');
-            tbBg.setAttribute('width', '320');
-            tbBg.setAttribute('height', '160');
+            tbBg.setAttribute('width', tbWidth);
+            tbBg.setAttribute('height', tbHeight);
             tbBg.setAttribute('fill', 'rgba(10, 36, 77, 0.95)');
             tbBg.setAttribute('stroke', 'white');
             tbBg.setAttribute('stroke-width', '2');
