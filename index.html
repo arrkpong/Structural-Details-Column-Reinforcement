@@ -222,10 +222,6 @@
                 overflow: auto;
             }
             
-            .menu-toggle {
-                display: block;
-            }
-            
             .sidebar {
                 width: 300px;
                 left: -350px; /* width 300 + padding ~40 */
@@ -346,19 +342,10 @@
                 gap: 0;
             }
             
-            /* Show hamburger menu in landscape mobile */
-            .menu-toggle {
-                display: block;
-            }
-            
-            /* Make sidebar hideable like portrait mode */
+            /* Make sidebar narrower for landscape mobile */
             .sidebar {
                 width: 300px;
                 left: -350px; /* width 300 + padding ~40 */
-            }
-            
-            .sidebar-overlay.active {
-                display: block;
             }
             
             .drawing-container {
@@ -915,20 +902,19 @@
                 if (elTbScale) elTbScale.textContent = valScale;
                 if (elTbNote) elTbNote.textContent = `${totalBars}-${state.mainSize} ${valNote}`;
 
-                // Update mobile title block elements
-                const elTbProjectMobile = document.getElementById('tb-project-mobile');
-                const elTbTitleMobile = document.getElementById('tb-title-mobile');
-                const elTbDateMobile = document.getElementById('tb-date-mobile');
-                const elTbDrawnMobile = document.getElementById('tb-drawn-mobile');
-                const elTbScaleMobile = document.getElementById('tb-scale-mobile');
-                const elTbNoteMobile = document.getElementById('tb-note-mobile');
-                
-                if (elTbProjectMobile) elTbProjectMobile.textContent = state.project.toUpperCase();
-                if (elTbTitleMobile) elTbTitleMobile.textContent = valTitle.toUpperCase();
-                if (elTbDateMobile) elTbDateMobile.textContent = valDate;
-                if (elTbDrawnMobile) elTbDrawnMobile.textContent = valDrawn;
-                if (elTbScaleMobile) elTbScaleMobile.textContent = valScale;
-                if (elTbNoteMobile) elTbNoteMobile.textContent = `${totalBars}-${state.mainSize} ${valNote}`;
+                // Update mobile title block elements (same data, different IDs)
+                const mobileIds = {
+                    'tb-project-mobile': state.project.toUpperCase(),
+                    'tb-title-mobile': valTitle.toUpperCase(),
+                    'tb-date-mobile': valDate,
+                    'tb-drawn-mobile': valDrawn,
+                    'tb-scale-mobile': valScale,
+                    'tb-note-mobile': `${totalBars}-${state.mainSize} ${valNote}`
+                };
+                Object.entries(mobileIds).forEach(([id, value]) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = value;
+                });
 
                 // 3. Clear SVG
                 svg.innerHTML = '';
