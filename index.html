@@ -624,9 +624,9 @@
             subLabelRebar.textContent = "Longitudinal Bars";
             group.appendChild(subLabelRebar);
 
-            // Main Ties Label - pointing to stirrup right side
-            const tiePointX = stX + stW;      // Stirrup right edge
-            const tiePointY = stY + stH/2;    // Middle height
+            // Hoops Label - pointing to stirrup (offset from rebar to touch stirrup line)
+            const tiePointX = stX + stW + 5;  // Outside stirrup edge (rebar is at stX+stW)
+            const tiePointY = stY + stH * 0.3;  // Upper third, not center (to avoid overlap)
             const tieMidX = startX + w + 40;
             const tieMidY = startY + h/2 - 30;
             const tieEndX = startX + w + 100;
