@@ -227,14 +227,8 @@
             }
             
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: -320px;
                 width: 300px;
-                height: 100vh;
-                z-index: 100;
-                transition: left 0.3s ease;
-                padding-top: 60px;
+                left: -350px; /* width 300 + padding ~40 */
             }
             .sidebar.open {
                 left: 0;
@@ -303,12 +297,9 @@
         @media (max-width: 480px) {
             .sidebar {
                 width: 280px;
-                left: -290px;
+                left: -320px; /* width 280 + padding ~30 */
                 padding: 10px;
                 padding-top: 55px;
-            }
-            .sidebar.open {
-                left: 0;
             }
             
             .sidebar h2 {
@@ -362,17 +353,8 @@
             
             /* Make sidebar hideable like portrait mode */
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: -320px;
                 width: 300px;
-                height: 100vh;
-                z-index: 100;
-                transition: left 0.3s ease;
-                padding-top: 60px;
-            }
-            .sidebar.open {
-                left: 0;
+                left: -350px; /* width 300 + padding ~40 */
             }
             
             .sidebar-overlay.active {
@@ -732,13 +714,9 @@
                 overlay.addEventListener('click', closeSidebar);
             }
             
-            // Close sidebar on window resize if larger than mobile
-            // Also redraw for orientation changes
+            // Redraw on window resize for orientation changes
             let resizeTimeout;
             window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
-                    closeSidebar();
-                }
                 // Debounce redraw for orientation change
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(() => {
@@ -818,14 +796,6 @@
             let startY = 0;
             let startPanX = 0;
             let startPanY = 0;
-            
-            function getMousePos(e) {
-                const rect = svg.getBoundingClientRect();
-                return {
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
-                };
-            }
             
             function startPan(e) {
                 if (e.button !== undefined && e.button !== 0) return; // Only left mouse button
