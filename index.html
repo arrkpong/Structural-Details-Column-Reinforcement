@@ -857,6 +857,14 @@
                 if (e.key === '0') zoomReset();
             });
             
+            // Set current date in DD/MM/YYYY format
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            const dateInput = document.getElementById('inp-date-val');
+            if (dateInput) dateInput.value = `${day}/${month}/${year}`;
+            
             updateDrawing();
         }
 
