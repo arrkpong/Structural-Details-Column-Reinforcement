@@ -27,16 +27,27 @@
 
         /* --- Sidebar Styles --- */
         .sidebar {
+            position: fixed;
+            top: 0;
+            left: -400px; /* Hidden completely (width 350 + padding 40 = 390) */
             width: 350px;
+            height: 100vh;
             background-color: var(--sidebar-bg);
             color: var(--sidebar-text);
             padding: 20px;
+            padding-top: 60px; /* Space for toggle button */
             overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+            box-shadow: none; /* No shadow when hidden */
             display: flex;
             flex-direction: column;
             gap: 15px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Easy-to-read font for UI */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            z-index: 100;
+            transition: left 0.3s ease, box-shadow 0.3s ease;
+        }
+        .sidebar.open {
+            left: 0;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.4);
         }
 
         .sidebar h2 { margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; font-size: 1.2rem; }
@@ -45,8 +56,8 @@
         .form-group input, .form-group select { 
             padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; 
         }
-        .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; }
+        .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 140px; }
         
         .section-header {
             background: #e0e0e0;
@@ -108,6 +119,11 @@
         .tb-value { flex-grow: 1; }
         .tb-project { font-size: 14px; font-weight: bold; color: var(--drawing-yellow); margin-bottom: 10px; border-bottom: 1px solid white; padding-bottom: 5px; }
 
+        /* Mobile title block hidden by default (shown via media query) */
+        .title-block-mobile {
+            display: none;
+        }
+
         /* Export Button Styles */
         .export-btn {
             width: 100%;
@@ -133,12 +149,336 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
+        /* Menu Toggle Button (visible on all screens) */
+        .menu-toggle {
+            display: block;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            background: var(--sidebar-bg);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: var(--sidebar-text);
+            margin: 5px 0;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* --- Responsive Breakpoints --- */
+
+        /* Tablet: max-width 1024px */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 300px;
+                padding: 15px;
+            }
+            .title-block {
+                width: 260px;
+                font-size: 11px;
+            }
+            .title-block-container {
+                right: 20px;
+                bottom: 15px;
+            }
+        }
+
+        /* Mobile: max-width 768px */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow: auto;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -320px;
+                width: 300px;
+                height: 100vh;
+                z-index: 100;
+                transition: left 0.3s ease;
+                padding-top: 60px;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+            
+            .drawing-container {
+                width: 100%;
+                min-height: 60vh;
+            }
+            
+            .viewport {
+                width: 100%;
+                height: 100%;
+            }
+            
+            .title-block-container.title-block-desktop {
+                display: none; /* Hide desktop version on mobile */
+            }
+            .title-block-container.title-block-mobile {
+                display: block !important; /* Show mobile version */
+                position: static !important; /* In normal flow, not fixed/absolute */
+                left: 0 !important;
+                right: 0 !important;
+                transform: none !important;
+                width: 100%;
+                padding: 15px;
+                margin: 0;
+                background: rgba(10, 36, 77, 0.98);
+                border-top: 2px solid white;
+                box-sizing: border-box;
+            }
+            .title-block-mobile .title-block {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                font-size: 12px;
+                padding: 0;
+                border: none;
+                background: transparent;
+            }
+            .title-block-mobile .tb-project {
+                font-size: 13px;
+                margin-bottom: 8px;
+                word-wrap: break-word;
+            }
+            .title-block-mobile .tb-row {
+                margin-bottom: 4px;
+            }
+            .title-block-mobile .tb-label {
+                width: auto;
+                min-width: 90px;
+                white-space: nowrap;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        /* Small Mobile: max-width 480px */
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 280px;
+                left: -290px;
+                padding: 10px;
+                padding-top: 55px;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .sidebar h2 {
+                font-size: 1rem;
+            }
+            
+            .section-header {
+                margin: 8px -10px 5px -10px;
+                padding: 4px 8px;
+                font-size: 0.85rem;
+            }
+            
+            .form-group label {
+                font-size: 0.8rem;
+            }
+            .form-group input, .form-group select {
+                padding: 6px;
+                font-size: 0.85rem;
+            }
+            
+            .export-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .title-block {
+                font-size: 10px;
+                padding: 10px;
+            }
+            .tb-label {
+                width: 70px;
+            }
+        }
+
+        /* Landscape Mobile: hide title block when height is too small */
+        @media (max-height: 500px) {
+            .title-block-container.title-block-desktop {
+                display: none;
+            }
+            
+            /* Single column layout for sidebar on landscape mobile */
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            /* Show hamburger menu in landscape mobile */
+            .menu-toggle {
+                display: block;
+            }
+            
+            /* Make sidebar hideable like portrait mode */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -320px;
+                width: 300px;
+                height: 100vh;
+                z-index: 100;
+                transition: left 0.3s ease;
+                padding-top: 60px;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+            
+            .drawing-container {
+                margin-left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        /* --- Zoom Controls --- */
+        .zoom-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 50;
+        }
+        .zoom-btn, .fullscreen-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-btn:hover, .fullscreen-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+        .fullscreen-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .zoom-level {
+            text-align: center;
+            font-size: 12px;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        /* Fullscreen mode */
+        .drawing-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 200;
+            background: var(--blueprint-bg);
+        }
+        .drawing-container.fullscreen .viewport {
+            width: 100%;
+            height: 100%;
+        }
+        .drawing-container.fullscreen .title-block-container {
+            display: none;
+        }
+        .drawing-container.fullscreen + .zoom-controls {
+            z-index: 250;
+        }
+
+        /* Mobile zoom controls always visible */
+        @media (max-width: 768px) {
+            .zoom-controls {
+                bottom: 15px;
+                right: 15px;
+            }
+            .zoom-btn, .fullscreen-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+
     </style>
 </head>
 <body>
 
+    <!-- Mobile Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Sidebar Overlay (for closing sidebar on mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- Sidebar Control Panel -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <h2>Panel Control</h2>
         
         <div class="section-header">Title</div>
@@ -261,7 +601,8 @@
             </svg>
         </div>
 
-        <div class="title-block-container">
+        <!-- Title Block (shown inside drawing-container for desktop) -->
+        <div class="title-block-container title-block-desktop">
             <div class="title-block">
                 <div class="tb-project"><span id="lbl-project">PROJECT</span>: <span id="tb-project">...</span></div>
                 <div class="tb-row">
@@ -286,6 +627,42 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Title Block for Mobile (outside drawing-container, in scroll flow) -->
+    <div class="title-block-container title-block-mobile">
+        <div class="title-block">
+            <div class="tb-project">PROJECT: <span id="tb-project-mobile">...</span></div>
+            <div class="tb-row">
+                <span class="tb-label">DWG TITLE:</span>
+                <span class="tb-value" id="tb-title-mobile">...</span>
+            </div>
+            <div class="tb-row">
+                <span class="tb-label">DATE:</span>
+                <span class="tb-value" id="tb-date-mobile">...</span>
+            </div>
+            <div class="tb-row">
+                <span class="tb-label">DRAWN BY:</span>
+                <span class="tb-value" id="tb-drawn-mobile">...</span>
+            </div>
+            <div class="tb-row">
+                <span class="tb-label">SCALE:</span>
+                <span class="tb-value" id="tb-scale-mobile">...</span>
+            </div>
+            <div class="tb-row">
+                <span class="tb-label">NOTE:</span>
+                <span class="tb-value" id="tb-note-mobile">...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div class="zoom-controls" id="zoomControls">
+        <button class="fullscreen-btn" id="fullscreenBtn" title="Fullscreen">⛶</button>
+        <button class="zoom-btn" id="zoomInBtn" title="Zoom In">+</button>
+        <div class="zoom-level" id="zoomLevel">100%</div>
+        <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">−</button>
+        <button class="zoom-btn" id="zoomResetBtn" title="Reset" style="font-size: 14px;">⟲</button>
     </div>
 
     <script>
@@ -326,10 +703,203 @@
 
         // --- Initialization ---
         function init() {
-            // Attach event listeners
+            // Attach event listeners for inputs
             Object.values(inputs).forEach(inp => {
                 if(inp) inp.addEventListener('input', updateDrawing);
             });
+            
+            // Mobile menu toggle setup
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            function toggleSidebar() {
+                menuToggle.classList.toggle('active');
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+            
+            function closeSidebar() {
+                menuToggle.classList.remove('active');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', toggleSidebar);
+            }
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+            
+            // Close sidebar on window resize if larger than mobile
+            // Also redraw for orientation changes
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+                // Debounce redraw for orientation change
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    updateDrawing();
+                }, 200);
+            });
+            
+            // --- Zoom and Fullscreen Setup ---
+            const drawingContainer = document.querySelector('.drawing-container');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const zoomResetBtn = document.getElementById('zoomResetBtn');
+            const zoomLevelDisplay = document.getElementById('zoomLevel');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            // Original viewBox values
+            const origViewBox = { x: -100, y: -50, w: 1400, h: 700 };
+            let currentZoom = 1;
+            let panX = 0; // Pan offset X
+            let panY = 0; // Pan offset Y
+            const minZoom = 0.5;
+            const maxZoom = 3;
+            const zoomStep = 0.25;
+            
+            function updateViewBox() {
+                // Calculate new viewBox based on zoom (smaller viewBox = zoomed in)
+                const newW = origViewBox.w / currentZoom;
+                const newH = origViewBox.h / currentZoom;
+                // Center the view + pan offset
+                const newX = origViewBox.x + (origViewBox.w - newW) / 2 + panX;
+                const newY = origViewBox.y + (origViewBox.h - newH) / 2 + panY;
+                svg.setAttribute('viewBox', `${newX} ${newY} ${newW} ${newH}`);
+                zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+            }
+            
+            function zoomIn() {
+                if (currentZoom < maxZoom) {
+                    currentZoom = Math.min(maxZoom, currentZoom + zoomStep);
+                    updateViewBox();
+                }
+            }
+            
+            function zoomOut() {
+                if (currentZoom > minZoom) {
+                    currentZoom = Math.max(minZoom, currentZoom - zoomStep);
+                    updateViewBox();
+                }
+            }
+            
+            function zoomReset() {
+                currentZoom = 1;
+                panX = 0;
+                panY = 0;
+                updateViewBox();
+            }
+            
+            function toggleFullscreen() {
+                drawingContainer.classList.toggle('fullscreen');
+                if (drawingContainer.classList.contains('fullscreen')) {
+                    fullscreenBtn.textContent = '✕';
+                    fullscreenBtn.title = 'Exit Fullscreen';
+                } else {
+                    fullscreenBtn.textContent = '⛶';
+                    fullscreenBtn.title = 'Fullscreen';
+                }
+            }
+            
+            // Event listeners for zoom controls
+            if (zoomInBtn) zoomInBtn.addEventListener('click', zoomIn);
+            if (zoomOutBtn) zoomOutBtn.addEventListener('click', zoomOut);
+            if (zoomResetBtn) zoomResetBtn.addEventListener('click', zoomReset);
+            if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // --- Pan (Drag) Functionality ---
+            let isPanning = false;
+            let startX = 0;
+            let startY = 0;
+            let startPanX = 0;
+            let startPanY = 0;
+            
+            function getMousePos(e) {
+                const rect = svg.getBoundingClientRect();
+                return {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+            }
+            
+            function startPan(e) {
+                if (e.button !== undefined && e.button !== 0) return; // Only left mouse button
+                isPanning = true;
+                const pos = e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+                startX = pos.x;
+                startY = pos.y;
+                startPanX = panX;
+                startPanY = panY;
+                svg.style.cursor = 'grabbing';
+                e.preventDefault();
+            }
+            
+            function doPan(e) {
+                if (!isPanning) return;
+                const pos = e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+                const dx = pos.x - startX;
+                const dy = pos.y - startY;
+                
+                // Convert screen pixels to SVG units (depends on current viewBox size vs element size)
+                const rect = svg.getBoundingClientRect();
+                const viewBoxW = origViewBox.w / currentZoom;
+                const viewBoxH = origViewBox.h / currentZoom;
+                const scaleX = viewBoxW / rect.width;
+                const scaleY = viewBoxH / rect.height;
+                
+                panX = startPanX - dx * scaleX;
+                panY = startPanY - dy * scaleY;
+                updateViewBox();
+                e.preventDefault();
+            }
+            
+            function endPan(e) {
+                isPanning = false;
+                svg.style.cursor = 'grab';
+            }
+            
+            // Mouse events
+            svg.addEventListener('mousedown', startPan);
+            svg.addEventListener('mousemove', doPan);
+            svg.addEventListener('mouseup', endPan);
+            svg.addEventListener('mouseleave', endPan);
+            
+            // Touch events
+            svg.addEventListener('touchstart', startPan, { passive: false });
+            svg.addEventListener('touchmove', doPan, { passive: false });
+            svg.addEventListener('touchend', endPan);
+            svg.addEventListener('touchcancel', endPan);
+            
+            // Mouse wheel zoom
+            svg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    // Scroll up = zoom in
+                    zoomIn();
+                } else {
+                    // Scroll down = zoom out
+                    zoomOut();
+                }
+            }, { passive: false });
+
+            // Set initial cursor
+            svg.style.cursor = 'grab';
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && drawingContainer.classList.contains('fullscreen')) {
+                    toggleFullscreen();
+                }
+                if (e.key === '+' || e.key === '=') zoomIn();
+                if (e.key === '-') zoomOut();
+                if (e.key === '0') zoomReset();
+            });
+            
             updateDrawing();
         }
 
@@ -375,15 +945,42 @@
                 if (elTbScale) elTbScale.textContent = valScale;
                 if (elTbNote) elTbNote.textContent = `${totalBars}-${state.mainSize} ${valNote}`;
 
+                // Update mobile title block elements
+                const elTbProjectMobile = document.getElementById('tb-project-mobile');
+                const elTbTitleMobile = document.getElementById('tb-title-mobile');
+                const elTbDateMobile = document.getElementById('tb-date-mobile');
+                const elTbDrawnMobile = document.getElementById('tb-drawn-mobile');
+                const elTbScaleMobile = document.getElementById('tb-scale-mobile');
+                const elTbNoteMobile = document.getElementById('tb-note-mobile');
+                
+                if (elTbProjectMobile) elTbProjectMobile.textContent = state.project.toUpperCase();
+                if (elTbTitleMobile) elTbTitleMobile.textContent = valTitle.toUpperCase();
+                if (elTbDateMobile) elTbDateMobile.textContent = valDate;
+                if (elTbDrawnMobile) elTbDrawnMobile.textContent = valDrawn;
+                if (elTbScaleMobile) elTbScaleMobile.textContent = valScale;
+                if (elTbNoteMobile) elTbNoteMobile.textContent = `${totalBars}-${state.mainSize} ${valNote}`;
+
                 // 3. Clear SVG
                 svg.innerHTML = '';
                 
-                // 4. Add Defs
+                // 4. Check orientation for layout
+                const isMobilePortrait = window.innerWidth < 768 && window.innerWidth < window.innerHeight;
+                
+                // Adjust viewBox for mobile portrait (vertical stacking)
+                if (isMobilePortrait) {
+                    // Portrait: taller viewBox for vertical stacking with extra space for titles
+                    svg.setAttribute('viewBox', '-50 -50 700 1350');
+                } else {
+                    // Landscape/Desktop: horizontal layout
+                    svg.setAttribute('viewBox', '-100 -50 1400 700');
+                }
+                
+                // 5. Add Defs
                 addDefs();
 
-                // 5. Draw Views
-                drawSectionView();
-                drawElevationView();
+                // 6. Draw Views
+                drawSectionView(isMobilePortrait);
+                drawElevationView(isMobilePortrait);
             } catch (err) {
                 console.error("Error updating drawing:", err);
             }
@@ -410,8 +1007,10 @@
             return el;
         }
 
-        function drawSectionView() {
-            const group = createEl('g', { id: 'section-view' });
+        function drawSectionView(isMobilePortrait = false) {
+            // Center on mobile portrait: shift X to center in viewBox width 700
+            const translateX = isMobilePortrait ? 100 : 0;
+            const group = createEl('g', { id: 'section-view', transform: `translate(${translateX}, 0)` });
             
             // Scale Factor: let's map input dimensions to drawing units
             // Assuming 1 unit = 1 pixel for simplicity in this ViewBox
@@ -717,8 +1316,11 @@
             svg.appendChild(group);
         }
 
-        function drawElevationView() {
-            const group = createEl('g', { id: 'elevation-view', transform: 'translate(700, 0)' });
+        function drawElevationView(isMobilePortrait = false) {
+            // Mobile portrait: stack below Section A-A and center; Desktop: side by side
+            const translateX = isMobilePortrait ? 150 : 700;
+            const translateY = isMobilePortrait ? 600 : 0;
+            const group = createEl('g', { id: 'elevation-view', transform: `translate(${translateX}, ${translateY})` });
             
             // Dynamic scaling: map actual height to visual height
             const totalHeight = state.height; // mm
