@@ -108,6 +108,22 @@
            ในแต่ละ Zone จะมี "เสา" (Columns) อยู่ข้างใน
         */
         const projectData = [
+
+            // --- ZONE 2: 1st Floor ---
+            {
+                zoneId: "zone-2",
+                title: "1st Floor to 2nd Floor",
+                topLevel: "2nd Fl. (+6.00m)",
+                bottomLevel: "1st Fl. (+3.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 250, mainBar: "22-DB25", confinementBar: "1-HP-DB10@150", tieBar: "8-RB9@300", extra: "3 WF-100x100", cover: "40mm" },
+                    { name: "C02", height: 1200, width: 750, mainBar: "14-DB32", confinementBar: "2-HP-DB12@150", tieBar: "3-RB12@300", extra: "_", cover: "40mm" },
+                    { name: "C03", height: 900, width: 750, mainBar: "14-DB28", confinementBar: "2-HP-DB12@150", tieBar: "3-RB9@300", extra: "_", cover: "40mm" },
+                    { name: "C04", height: 1200, width: 750, mainBar: "18-DB25", confinementBar: "2-HP-DB12@150", tieBar: "5-RB9@300", extra: "_", cover: "40mm" },
+                    { name: "C05", isSchematic: true },
+                    { name: "C06", isSchematic: true },
+                ]
+            },
             
             // --- ZONE 1: Basement ---
             {
@@ -116,12 +132,12 @@
                 topLevel: "1st Fl. (+3.00m)",
                 bottomLevel: "basement (0.00m)",
                 columns: [
-                    { name: "C01", height: 2000, width: 250, isSchematic: true },
-                    { name: "C02", height: 1200, width: 750, isSchematic: true },
-                    { name: "C03", height: 900, width: 750, isSchematic: true },
-                    { name: "C04", height: 1200, width: 750, isSchematic: true },
-                    { name: "C05", height: 2100, width: 400, isSchematic: true },
-                    { name: "C06", height: 2500, width: 450, isSchematic: true },
+                    { name: "C01", isSchematic: true },
+                    { name: "C02", isSchematic: true },
+                    { name: "C03", isSchematic: true },
+                    { name: "C04", isSchematic: true },
+                    { name: "C05", isSchematic: true },
+                    { name: "C06", isSchematic: true },
                 ]
             },
             // --- ZONE 0: Foundation ---
@@ -630,17 +646,21 @@
         // วนลูปทีละ "โซนชั้น" (Zone)
         projectData.forEach(zone => {
             
-            // 4.1 หาความสูงเสาสูงสุดของ Zone นี้ (เผื่อเสาความสูงไม่เท่ากัน)
+            // 4.1 หาความสูงเสาสูงสุดของ Zone นี้ (เฉพาะเสาที่มี height จริง)
             let maxColumnHeight = 0;
             zone.columns.forEach(c => {
-                if (c.height > maxColumnHeight) maxColumnHeight = c.height;
+                // ข้าม Schematic/Terminated ที่ไม่มี height หรือใช้ค่า height ถ้ามี
+                const h = c.height || 0;
+                if (h > maxColumnHeight) maxColumnHeight = h;
             });
+            // ถ้าทุกเสาเป็น Schematic (ไม่มี height) ใช้ค่า default
+            if (maxColumnHeight === 0) maxColumnHeight = 1500;
             
             // คำนวณความสูงรวมทั้งหมด (Max Height + Base + Max Section Height)
-            // หาความสูง Section ที่มากที่สุดใน Zone นี้ (เผื่อเสาขนาดไม่เท่ากัน หรือเป็นเสาหยุด/Schematic)
+            // หาความสูง Section ที่มากที่สุดใน Zone นี้ (เผื่อเสาขนาดไม่เท่ากัน)
             let maxSectionHeight = 0;
             zone.columns.forEach(c => {
-                 if (!c.isTerminated && !c.isSchematic) { // คำนวณเฉพาะเสาที่มี Section
+                 if (!c.isTerminated && !c.isSchematic && c.width) { // คำนวณเฉพาะเสาที่มี Section และ width
                      const currentSecH = c.width + 200; // เพิ่ม padding สำหรับ dimension และ label
                      if(currentSecH > maxSectionHeight) maxSectionHeight = currentSecH;
                  }
