@@ -425,15 +425,22 @@
         // 3.1 ฟังก์ชันสร้าง Story Box (บอกระดับชั้น)
         function generateStoryBox(topText, bottomText, height, viewHeight) {
             const { startY } = CONFIG;
+            // ระยะห่างระหว่าง Text บน กับ Line บน = startY(150) - 50 = 100
+            const spacing = startY - 50; 
             
+            // Text ล่างอยู่ตำแหน่ง viewHeight - 50 (เผื่อขอบล่าง 50)
+            const bottomTextY = viewHeight - 50;
+            // Line ล่างจึงควรอยู่เหนือ Text ขึ้นมา 100 เท่ากัน
+            const bottomLineY = bottomTextY - spacing;
+
             return `
                 <div class="box story-box">
                     <svg width="250" height="${viewHeight}" xmlns="http://www.w3.org/2000/svg">
                         <text x="125" y="50" font-size="24" fill="blue" font-weight="bold" text-anchor="middle">${topText}</text>
                         <line x1="20" y1="${startY}" x2="230" y2="${startY}" stroke="blue" stroke-width="2" stroke-dasharray="10,5"/>
 
-                        <text x="125" y="${startY + height + 50}" font-size="24" fill="blue" font-weight="bold" text-anchor="middle">${bottomText}</text>
-                        <line x1="20" y1="${startY + height}" x2="230" y2="${startY + height}" stroke="blue" stroke-width="2" stroke-dasharray="10,5"/>
+                        <text x="125" y="${bottomTextY}" font-size="24" fill="blue" font-weight="bold" text-anchor="middle">${bottomText}</text>
+                        <line x1="20" y1="${bottomLineY}" x2="230" y2="${bottomLineY}" stroke="blue" stroke-width="2" stroke-dasharray="10,5"/>
                     </svg>
                 </div>
             `;
