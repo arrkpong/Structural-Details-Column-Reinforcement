@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Column Schedule (Full Version)</title>
+    <style>
+        /* CSS Styling */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            background-color: #f4f4f4;
+        }
+
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+
+        .schedule-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* กล่องคลุมแต่ละโซนชั้น (Zone Wrapper) */
+        .floor-zone {
+            margin-bottom: 40px;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 20px;
+        }
+
+        .zone-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 15px;
+            background-color: #e9ecef;
+            padding: 10px;
+            border-left: 5px solid #007bff;
+        }
+
+        /* จัดเรียงแนวนอน (Flexbox) */
+        .drawing-row {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto; /* Scroll แนวนอนถ้าเสาเยอะ */
+            padding-bottom: 10px;
+            align-items: flex-start;
+        }
+
+        /* กรอบ SVG */
+        .box {
+            border: 1px solid #000;
+            background: #fff;
+            flex-shrink: 0; /* ห้ามหด */
+        }
+
+        .story-box {
+            border: 2px solid #000;
+            background-color: #fdfdfd;
+            position: sticky; /* (Optional) ถ้าอยากให้ติดขอบซ้ายเวลาเลื่อน */
+            left: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Structural Details – Column Schedule</h1>
+
+    <div id="app" class="schedule-container">
+        </div>
+
+    <script>
+        // ==========================================
+        // 1. DATA STRUCTURE (ข้อมูลโครงสร้าง)
+        // ==========================================
+        /* เราแบ่งข้อมูลเป็น "ชั้นๆ" (Zones)
+           ในแต่ละ Zone จะมี "เสา" (Columns) อยู่ข้างใน
+        */
+        const projectData = [
+            // --- ZONE 2: 1st Floor ไป 2nd Floor ---
+            {
+                zoneId: "zone-2",
+                title: "Zone: 1st Floor to 2nd Floor",
+                topLevel: "2nd Floor (+7.00)",
+                bottomLevel: "1st Floor (+3.50)",
+                columns: [
+                    { name: "C01", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
+                    { name: "C02", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
+                    { name: "C03", height: 2000, width: 300, mainBar: "16-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
+                    { name: "C04", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
+                ]
+            },
+            // --- ZONE 1: Basement ไป 1st Floor ---
+            {
+                zoneId: "zone-1",
+                title: "Zone: Basement to 1st Floor",
+                topLevel: "1st Floor (+3.50)",
+                bottomLevel: "Basement (+0.00)",
+                columns: [
+                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                    { name: "C03", height: 2000, width: 300, mainBar: "20-DB25", tieBar: "RB9@100" },
+                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                ]
+            },
+            // --- ZONE 0: Foundation ไป Basement ---
+            {
+                zoneId: "zone-0",
+                title: "Zone: Foundation to Basement",
+                topLevel: "Basement (+0.00)",
+                bottomLevel: "Foundation (-2.00)",
+                columns: [
+                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                    { name: "C03", height: 2000, width: 300, mainBar: "24-DB25", tieBar: "RB9@100" },
+                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                ]
+            }
+        ];
+
+        // ==========================================
+        // 2. CONFIGURATION (ค่าคงที่สำหรับการวาด)
+        // ==========================================
+        const CONFIG = {
+            startX: 150,     // จุดเริ่มวาด X
+            startY: 150,     // จุดเริ่มวาด Y (เว้นที่ข้างบนให้ชื่อชั้น)
+            dimOffset: 40,   // ระยะห่างเส้น Dimension จากเสา
+            textPadding: 50, // ระยะห่างตัวหนังสือใต้เสา
+            baseSvgHeight: 400 // ความสูงพื้นฐานของ SVG ที่ยังไม่รวมความสูงเสา
+        };
+
+        // ==========================================
+        // 3. FUNCTIONS (ฟังก์ชันวาด)
+        // ==========================================
+
+        // 3.1 ฟังก์ชันสร้าง Story Box (บอกระดับชั้น)
+        function generateStoryBox(topText, bottomText, height) {
+            const svgHeight = height + CONFIG.baseSvgHeight;
+            const { startY } = CONFIG;
+            
+            return `
+                <div class="box story-box">
+                    <svg width="250" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                        <text x="125" y="50" font-size="24" fill="blue" font-weight="bold" text-anchor="middle">${topText}</text>
+                        <line x1="20" y1="${startY}" x2="230" y2="${startY}" stroke="blue" stroke-width="2" stroke-dasharray="10,5"/>
+
+                        <text x="125" y="${startY + height + 50}" font-size="24" fill="blue" font-weight="bold" text-anchor="middle">${bottomText}</text>
+                        <line x1="20" y1="${startY + height}" x2="230" y2="${startY + height}" stroke="blue" stroke-width="2" stroke-dasharray="10,5"/>
+                    </svg>
+                </div>
+            `;
+        }
+
+        // 3.2 ฟังก์ชันสร้าง Column Box (วาดเสา + Dimensions)
+        function generateColumnSVG(col) {
+            const { startX, startY, dimOffset, textPadding } = CONFIG;
+            const svgHeight = col.height + CONFIG.baseSvgHeight; // SVG ยืดหดตามความสูงเสา
+            const uniqueId = `tick-${col.name}-${Math.floor(Math.random() * 1000)}`; // สร้าง ID ไม่ซ้ำ
+
+            return `
+                <div class="box column-box">
+                    <svg width="550" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                        
+                        <defs>
+                            <marker id="${uniqueId}" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+                                <line x1="2" y1="10" x2="10" y2="2" stroke="red" stroke-width="2" />
+                            </marker>
+                        </defs>
+
+                        <text x="${startX + col.width/2}" y="50" font-size="32" fill="red" font-weight="bold" text-anchor="middle">${col.name}</text>
+
+                        <rect x="${startX}" y="${startY}" width="${col.width}" height="${col.height}" 
+                              fill="none" stroke="black" stroke-width="4"/>
+
+                        <g stroke="red" stroke-width="2">
+                            <line x1="${startX}" y1="${startY}" x2="${startX}" y2="${startY - dimOffset - 15}" stroke-width="1"/>
+                            <line x1="${startX + col.width}" y1="${startY}" x2="${startX + col.width}" y2="${startY - dimOffset - 15}" stroke-width="1"/>
+                            <line x1="${startX}" y1="${startY - dimOffset}" x2="${startX + col.width}" y2="${startY - dimOffset}"
+                                  marker-start="url(#${uniqueId})" marker-end="url(#${uniqueId})"/>
+                            <text x="${startX + col.width/2}" y="${startY - dimOffset - 10}" font-size="18" fill="red" text-anchor="middle">${col.width}</text>
+                        </g>
+
+                        <g stroke="red" stroke-width="2">
+                            <line x1="${startX}" y1="${startY}" x2="${startX - dimOffset - 15}" y2="${startY}" stroke-width="1"/>
+                            <line x1="${startX}" y1="${startY + col.height}" x2="${startX - dimOffset - 15}" y2="${startY + col.height}" stroke-width="1"/>
+                            <line x1="${startX - dimOffset}" y1="${startY}" x2="${startX - dimOffset}" y2="${startY + col.height}"
+                                  marker-start="url(#${uniqueId})" marker-end="url(#${uniqueId})"/>
+                            <text x="${startX - dimOffset - 15}" y="${startY + col.height/2}" font-size="18" fill="red" text-anchor="middle"
+                                  transform="rotate(-90, ${startX - dimOffset - 15}, ${startY + col.height/2})">${col.height}</text>
+                        </g>
+
+                        <g font-size="18" fill="#333" font-family="monospace">
+                            <text x="${startX}" y="${startY + col.height + textPadding}">MAIN : ${col.mainBar}</text>
+                            <text x="${startX}" y="${startY + col.height + textPadding + 25}">CONFINEMENT BAR : ${col.confinementBar}</text>
+                            <text x="${startX}" y="${startY + col.height + textPadding + 50}">TIE  : ${col.tieBar}</text>
+                            <text x="${startX}" y="${startY + col.height + textPadding + 75}">EXTRA : ${col.extra}</text>
+                            <text x="${startX}" y="${startY + col.height + textPadding + 100}">COVER : ${col.cover}</text>
+                        </g>
+
+                    </svg>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 4. MAIN EXECUTION (ประมวลผล)
+        // ==========================================
+        const appContainer = document.getElementById('app');
+        let fullContentHTML = "";
+
+        // วนลูปทีละ "โซนชั้น" (Zone)
+        projectData.forEach(zone => {
+            
+            // 4.1 หาความสูงอ้างอิงของชั้นนี้ (ใช้เสาต้นแรกเป็นเกณฑ์)
+            // (ในทางปฏิบัติควรใช้ค่าความสูงจริงของชั้นนั้นๆ)
+            const refHeight = zone.columns[0].height;
+
+            // 4.2 สร้าง HTML ส่วนหัวของ Zone
+            fullContentHTML += `
+                <div class="floor-zone">
+                    <div class="zone-title">${zone.title}</div>
+                    <div class="drawing-row">
+            `;
+
+            // 4.3 ใส่ Story Box (ซ้ายสุด) แค่ครั้งเดียว
+            fullContentHTML += generateStoryBox(zone.topLevel, zone.bottomLevel, refHeight);
+
+            // 4.4 วนลูปใส่เสา (Columns)
+            zone.columns.forEach(col => {
+                fullContentHTML += generateColumnSVG(col);
+            });
+
+            // ปิด Tag ของ Zone
+            fullContentHTML += `
+                    </div>
+                </div>
+            `;
+        });
+
+        // แสดงผลลัพธ์
+        appContainer.innerHTML = fullContentHTML;
+
+    </script>
+</body>
+</html>

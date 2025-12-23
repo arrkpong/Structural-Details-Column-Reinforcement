@@ -1187,9 +1187,12 @@
             subLabelRebar.textContent = "Longitudinal Bars";
             group.appendChild(subLabelRebar);
 
-            // Hoops Label - pointing to stirrup (offset from rebar to touch stirrup line)
-            const tiePointX = stX + stW + 5;  // Outside stirrup edge (rebar is at stX+stW)
-            const tiePointY = stY + stH * 0.3;  // Upper third, not center (to avoid overlap)
+            // Hoops Label - pointing to stirrup line (between bars, not at bar position)
+            // Calculate position between first and second bar on right edge
+            const barSpacingY = (stH - 2 * r) / (state.ny - 1);
+            // Point to stirrup line midway between first and second bar
+            const tiePointX = stX + stW + r + 2;  // Just outside the stirrup line
+            const tiePointY = stY + r + barSpacingY / 2;  // Midway between first two bars
             const tieMidX = startX + w + 40;
             const tieMidY = startY + h/2 - 30;
             const tieEndX = startX + w + 100;
