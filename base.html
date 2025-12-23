@@ -5,62 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Structural Column Schedule (Full Version)</title>
     <style>
-        /* CSS Styling */
+        /* ==========================================
+           CSS Styling for Column Schedule
+           ==========================================
+           โครงสร้างหลัก:
+           - body: พื้นหลังหน้าเว็บ
+           - schedule-container: กล่องคลุมหลัก (พื้นขาว)
+           - floor-zone: กล่องคลุมแต่ละโซนชั้น
+           - drawing-row: แถวที่ใส่ Story Box + Column Boxes
+           - box: กรอบ SVG พื้นฐาน
+           - story-box: กล่องแสดงระดับชั้น
+           - column-box: กล่องแสดงรายละเอียดเสา
+           ========================================== */
+
+        /* ---------- 1. Body & Global ---------- */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             padding: 20px; 
-            background-color: #f4f4f4;
+            background-color: #f4f4f4; /* พื้นหลังสีเทาอ่อน */
         }
 
-        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        /* ---------- 2. Header (H1) ---------- */
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 30px; 
+        }
 
+        /* ---------- 3. Main Container ---------- */
+        /* กล่องคลุมหลักทั้งหน้า - พื้นขาว มีเงา */
         .schedule-container {
             max-width: 100%;
             margin: 0 auto;
             background: white;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* เงานุ่มๆ */
         }
 
-        /* กล่องคลุมแต่ละโซนชั้น (Zone Wrapper) */
+        /* ---------- 4. Floor Zone (กล่องแต่ละชั้น) ---------- */
+        /* กล่องคลุมแต่ละโซน เช่น "Foundation to 1st Floor" */
         .floor-zone {
             margin-bottom: 40px;
-            border-bottom: 2px dashed #ccc;
+            border-bottom: 2px dashed #ccc; /* เส้นแบ่งโซน */
             padding-bottom: 20px;
         }
 
+        /* หัวข้อโซน */
         .zone-title {
             font-size: 20px;
             font-weight: bold;
             color: #444;
             margin-bottom: 15px;
-            background-color: #e9ecef;
+            background-color: #e9ecef; /* พื้นหลังสีเทาอ่อน */
             padding: 10px;
-            border-left: 5px solid #007bff;
+            border-left: 5px solid #007bff; /* แถบสีน้ำเงินซ้าย */
         }
 
-        /* จัดเรียงแนวนอน (Flexbox) */
+        /* ---------- 5. Drawing Row (แถว SVG) ---------- */
+        /* จัดเรียง Story Box + Column Boxes แนวนอน */
         .drawing-row {
             display: flex;
-            gap: 15px;
+            gap: 15px; /* ระยะห่างระหว่าง Box */
             overflow-x: auto; /* Scroll แนวนอนถ้าเสาเยอะ */
             padding-bottom: 10px;
-            align-items: flex-start;
+            align-items: flex-start; /* จัดให้ชิดบน */
         }
 
-        /* กรอบ SVG */
+        /* ---------- 6. Box (กรอบ SVG พื้นฐาน) ---------- */
         .box {
             border: 1px solid #000;
             background: #fff;
-            flex-shrink: 0; /* ห้ามหด */
+            flex-shrink: 0; /* ห้ามหด ให้ Scroll แทน */
         }
 
+        /* ---------- 7. Story Box (กล่องระดับชั้น) ---------- */
+        /* แสดง Top Level / Bottom Level ทางซ้ายสุด */
         .story-box {
             border: 2px solid #000;
             background-color: #fdfdfd;
-            position: sticky; /* (Optional) ถ้าอยากให้ติดขอบซ้ายเวลาเลื่อน */
+            position: sticky; /* ติดขอบซ้ายเวลาเลื่อน (Optional) */
             left: 0;
         }
+
+        /* ---------- 8. Column Box (ถ้าต้องการ Style เพิ่ม) ---------- */
+        /* ปัจจุบันใช้ .box เป็นพื้นฐาน */
+        /* .column-box { } */
 
     </style>
 </head>
@@ -229,11 +258,11 @@
         // 2. CONFIGURATION (ค่าคงที่สำหรับการวาด)
         // ==========================================
         const CONFIG = {
-            startX: 150,     // จุดเริ่มวาด X
+            startX: 150,     // จุดเริ่มวาด X (ค่าขั้นต่ำสำหรับ StoryBox & คำนวณกึ่งกลาง)
             startY: 150,     // จุดเริ่มวาด Y (เว้นที่ข้างบนให้ชื่อชั้น)
             dimOffset: 40,   // ระยะห่างเส้น Dimension จากเสา
             textPadding: 50, // ระยะห่างตัวหนังสือใต้เสา
-            baseSvgHeight: 400 // ความสูงพื้นฐานของ SVG ที่ยังไม่รวมความสูงเสา
+            baseSvgHeight: 400 // ความสูงพื้นฐานของ SVG (ไม่รวมความสูงเสา)
         };
 
         // ==========================================
@@ -510,7 +539,7 @@
 
             // 5. Dimension รอบรูปตัด (Dimensions for Section View)
             const dimOffset = 30;
-            const tickSize = 5;
+            const tickSize = 5; // ความยาวเส้นขีดมิติ
             const dimColor = "red";
             
             // 5.1 Horizontal Dimension (Top)
