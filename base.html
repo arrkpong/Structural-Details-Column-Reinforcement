@@ -79,43 +79,148 @@
            ในแต่ละ Zone จะมี "เสา" (Columns) อยู่ข้างใน
         */
         const projectData = [
-            // --- ZONE 2: 1st Floor ไป 2nd Floor ---
+            // Mock Data สำหรับตึก 10 ชั้น (Top-Down: ชั้นดาดฟ้า -> ฐานราก)
+            // --- ZONE 10 (ROOF) ---
+            {
+                zoneId: "zone-10",
+                title: "10th Floor to Roof",
+                topLevel: "Roof (+33.00m)",
+                bottomLevel: "10th Fl. (+30.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 400, isTerminated: true },
+                    { name: "C02", height: 2000, width: 400, isTerminated: true },
+                    { name: "C03", height: 2000, width: 400, isTerminated: true },
+                    { name: "C04", height: 2000, width: 400, isTerminated: true },
+                ]
+            },
+            // --- ZONE 9 ---
+            {
+                zoneId: "zone-9",
+                title: "9th Floor to 10th Floor",
+                topLevel: "10th Fl. (+30.00m)",
+                bottomLevel: "9th Fl. (+27.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 400, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB9@200", extra: "-", cover: "30mm" },
+                    { name: "C02", height: 2000, width: 400, isSchematic: true }, // Typical
+                    { name: "C03", height: 2000, width: 400, isSchematic: true }, // Typical
+                    { name: "C04", height: 2000, width: 400, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB9@200", extra: "-", cover: "30mm" },
+                ]
+            },
+            // --- ZONE 8 ---
+            {
+                zoneId: "zone-8",
+                title: "8th Floor to 9th Floor",
+                topLevel: "9th Fl. (+27.00m)",
+                bottomLevel: "8th Fl. (+24.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 400, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB9@200", extra: "-", cover: "30mm" },
+                    { name: "C02", height: 2000, width: 400, isSchematic: true },
+                    { name: "C03", height: 2000, width: 400, isSchematic: true },
+                    { name: "C04", height: 2000, width: 400, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB9@200", extra: "-", cover: "30mm" },
+                ]
+            },
+            // --- ZONE 7 (เปลี่ยนขนาดเสา) ---
+            {
+                zoneId: "zone-7",
+                title: "7th Floor to 8th Floor",
+                topLevel: "8th Fl. (+24.00m)",
+                bottomLevel: "7th Fl. (+21.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                    { name: "C03", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                    { name: "C04", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                ]
+            },
+            // --- ZONE 6 ---
+            {
+                zoneId: "zone-6",
+                title: "6th Floor to 7th Floor",
+                topLevel: "7th Fl. (+21.00m)",
+                bottomLevel: "6th Fl. (+18.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 500, isSchematic: true },
+                    { name: "C03", height: 2000, width: 500, isSchematic: true },
+                    { name: "C04", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                ]
+            },
+            // --- ZONE 5 ---
+            {
+                zoneId: "zone-5",
+                title: "5th Floor to 6th Floor",
+                topLevel: "6th Fl. (+18.00m)",
+                bottomLevel: "5th Fl. (+15.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 500, isSchematic: true },
+                    { name: "C03", height: 2000, width: 500, isSchematic: true },
+                    { name: "C04", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                ]
+            },
+            // --- ZONE 4 ---
+            {
+                zoneId: "zone-4",
+                title: "4th Floor to 5th Floor",
+                topLevel: "5th Fl. (+15.00m)",
+                bottomLevel: "4th Fl. (+12.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 500, isSchematic: true },
+                    { name: "C03", height: 2000, width: 500, isSchematic: true },
+                    { name: "C04", height: 2000, width: 500, mainBar: "16-DB25", confinementBar: "RB9@100", tieBar: "RB9@150", extra: "-", cover: "40mm" },
+                ]
+            },
+            // --- ZONE 3 (เปลี่ยนขนาดใหญ่ขึ้น) ---
+            {
+                zoneId: "zone-3",
+                title: "3rd Floor to 4th Floor",
+                topLevel: "4th Fl. (+12.00m)",
+                bottomLevel: "3rd Fl. (+9.00m)",
+                columns: [
+                    { name: "C01", height: 2000, width: 600, mainBar: "20-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 600, mainBar: "20-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                    { name: "C03", height: 2000, width: 600, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                    { name: "C04", height: 2000, width: 600, mainBar: "20-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                ]
+            },
+            // --- ZONE 2 ---
             {
                 zoneId: "zone-2",
-                title: "Zone: 1st Floor to 2nd Floor",
-                topLevel: "2nd Floor (+7.00)",
-                bottomLevel: "1st Floor (+3.50)",
+                title: "2nd Floor to 3rd Floor",
+                topLevel: "3rd Fl. (+9.00m)",
+                bottomLevel: "2nd Fl. (+6.00m)",
                 columns: [
-                    { name: "C01", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
-                    { name: "C02", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
-                    { name: "C03", height: 2000, width: 300, mainBar: "16-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
-                    { name: "C04", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
+                    { name: "C01", height: 2000, width: 600, mainBar: "20-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 600, isSchematic: true },
+                    { name: "C03", height: 2000, width: 600, isSchematic: true },
+                    { name: "C04", height: 2000, width: 600, mainBar: "20-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
                 ]
             },
-            // --- ZONE 1: Basement ไป 1st Floor ---
+            // --- ZONE 1 ---
             {
                 zoneId: "zone-1",
-                title: "Zone: Basement to 1st Floor",
-                topLevel: "1st Floor (+3.50)",
-                bottomLevel: "Basement (+0.00)",
+                title: "1st Floor to 2nd Floor",
+                topLevel: "2nd Fl. (+6.00m)",
+                bottomLevel: "1st Fl. (+3.00m)",
                 columns: [
-                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
-                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
-                    { name: "C03", height: 2000, width: 300, mainBar: "20-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
-                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C01", height: 2000, width: 600, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 600, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                    { name: "C03", height: 2000, width: 600, mainBar: "28-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
+                    { name: "C04", height: 2000, width: 600, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "40mm" },
                 ]
             },
-            // --- ZONE 0: Foundation ไป Basement ---
+            // --- ZONE 0: Foundation ---
             {
                 zoneId: "zone-0",
-                title: "Zone: Foundation to Basement",
-                topLevel: "Basement (+0.00)",
-                bottomLevel: "Foundation (-2.00)",
+                title: "Foundation to 1st Floor",
+                topLevel: "1st Fl. (+3.00m)",
+                bottomLevel: "Foundation (-1.50m)",
                 columns: [
-                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
-                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
-                    { name: "C03", height: 2000, width: 300, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
-                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C01", height: 2000, width: 700, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "50mm" },
+                    { name: "C02", height: 2000, width: 700, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "50mm" },
+                    { name: "C03", height: 2000, width: 700, mainBar: "28-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "50mm" },
+                    { name: "C04", height: 2000, width: 700, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@125", extra: "-", cover: "50mm" },
                 ]
             }
         ];
@@ -163,25 +268,37 @@
             // คำนวณจำนวนเหล็กต่อด้าน (สมมติแบ่งครึ่ง)
             const barsPerSide = Math.ceil(mainBarCount / 4); // เหล็กมุม + เหล็กกลาง
             
+            // คำนวณความยาวเหล็ก
+            // ถ้าเป็นเสา Foundation: ด้านล่างงอฉาก, ด้านบนยื่นต่อ (Dowels)
+            // ถ้าเป็นเสาปกติ: ด้านล่างต่อจากชั้นก่อน, ด้านบนยื่นต่อ (Dowels)
+            
+            // Note: startY คือระดับพื้นชั้นบน (Top Level)
+            // ดังนั้นเหล็กต้องยื่นทะลุ startY ขึ้นไป (ค่า Y ลดลง)
+            const dowelLength = 40; // ความยาวเหล็กเสียบ (สมมติ)
+            const topBarY = startY - dowelLength; 
+            
             // เหล็กหลักด้านซ้าย
             const leftX = startX + cover;
             if (isFoundation) {
-                // วาดเหล็กงอฉาก (L-Shape) หันออกซ้าย
-                rebarSVG += `<path d="M ${leftX} ${startY + cover} L ${leftX} ${startY + col.height - cover} L ${leftX - 20} ${startY + col.height - cover}" 
+                // Foundation: งอล่าง, ยื่นบน
+                rebarSVG += `<path d="M ${leftX} ${topBarY} L ${leftX} ${startY + col.height - cover} L ${leftX - 20} ${startY + col.height - cover}" 
                              stroke="#DC143C" stroke-width="${mainBarRadius}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
             } else {
-                rebarSVG += `<line x1="${leftX}" y1="${startY + cover}" x2="${leftX}" y2="${startY + col.height - cover}" 
+                // Normal: ยื่นบน (เพื่อต่อชั้นถัดไป)
+                // (จริงๆ ต้องมีด้านล่างด้วย แต่ใน Schedule มักวาดแค่เส้นตรงยาวๆ แทนการทาบ)
+                rebarSVG += `<line x1="${leftX}" y1="${topBarY}" x2="${leftX}" y2="${startY + col.height - cover}" 
                              stroke="#DC143C" stroke-width="${mainBarRadius}" stroke-linecap="round"/>`;
             }
             
             // เหล็กหลักด้านขวา
             const rightX = startX + col.width - cover;
             if (isFoundation) {
-                // วาดเหล็กงอฉาก (L-Shape) หันออกขวา
-                rebarSVG += `<path d="M ${rightX} ${startY + cover} L ${rightX} ${startY + col.height - cover} L ${rightX + 20} ${startY + col.height - cover}" 
+                // Foundation: งอล่าง, ยื่นบน
+                rebarSVG += `<path d="M ${rightX} ${topBarY} L ${rightX} ${startY + col.height - cover} L ${rightX + 20} ${startY + col.height - cover}" 
                              stroke="#DC143C" stroke-width="${mainBarRadius}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
             } else {
-                rebarSVG += `<line x1="${rightX}" y1="${startY + cover}" x2="${rightX}" y2="${startY + col.height - cover}" 
+                // Normal: ยื่นบน
+                rebarSVG += `<line x1="${rightX}" y1="${topBarY}" x2="${rightX}" y2="${startY + col.height - cover}" 
                              stroke="#DC143C" stroke-width="${mainBarRadius}" stroke-linecap="round"/>`;
             }
             
@@ -190,8 +307,8 @@
                 const middleBarsCount = Math.min(Math.floor((mainBarCount - 4) / 2), 3);
                 const spacing = (col.width - 2 * cover) / (middleBarsCount + 1);
                 for (let i = 1; i <= middleBarsCount; i++) {
-                    const midX = startX + cover + spacing * i;
-                    rebarSVG += `<line x1="${midX}" y1="${startY + cover}" x2="${midX}" y2="${startY + col.height - cover}" 
+                    const x = startX + cover + spacing * i;
+                    rebarSVG += `<line x1="${x}" y1="${topBarY}" x2="${x}" y2="${startY + col.height - cover}" 
                                  stroke="#DC143C" stroke-width="${mainBarRadius - 1}" stroke-linecap="round" stroke-dasharray="4,2"/>`;
                 }
             }
@@ -447,14 +564,65 @@
         }
 
         // 3.2 ฟังก์ชันสร้าง Column Box (วาดเสา + Dimensions + Section)
-        function generateColumnSVG(col, isFoundation = false, viewHeight) {
-            const { startX, startY, dimOffset, textPadding } = CONFIG;
+        function generateColumnSVG(col, isFoundation = false, viewHeight, svgWidth) {
+            const { startY, dimOffset, textPadding } = CONFIG; // เอา startX ออกจาก CONFIG
+            
+            // คำนวณ startX ให้เสาอยู่ตรงกลาง Box (Center Align)
+            // แต่ต้องไม่น้อยกว่า 150 (CONFIG.startX เดิม) เพื่อให้มีที่เหลือสำหรับ Dimension ด้านซ้าย
+            const calculatedStartX = (svgWidth - col.width) / 2;
+            const startX = Math.max(calculatedStartX, 150);
             
             const uniqueId = `tick-${col.name}-${Math.floor(Math.random() * 1000)}`; 
+            
+            // ===== CASE 1: เสาหยุด (Terminated) =====
+            if (col.isTerminated) {
+                 const centerX = startX + col.width/2;
+                 const centerY = startY + (viewHeight - startY)/2; // กึ่งกลางพื้นที่วาด
 
+                 return `
+                    <div class="box column-box">
+                        <svg width="${svgWidth}" height="${viewHeight}" xmlns="http://www.w3.org/2000/svg">
+                            <!-- ชื่อเสา - ใช้ svgWidth/2 เพื่อให้อยู่กลาง Box จริงๆ -->
+                            <text x="${svgWidth/2}" y="50" font-size="32" fill="red" font-weight="bold" text-anchor="middle">${col.name}</text>
+                            
+                            <!-- สัญลักษณ์เสาหยุด (Flat Rectangle) -->
+                            <!-- วางไว้ตรงกลาง Box -->
+                            <rect x="${svgWidth/2 - col.width/2}" y="${centerY - 10}" width="${col.width}" height="20" 
+                                  fill="none" stroke="black" stroke-width="2"/>
+                                  
+                            <!-- Optional: Text บอกสถานะ -->
+                             <text x="${svgWidth/2}" y="${centerY + 40}" font-size="16" fill="#666" text-anchor="middle">(Terminated)</text>
+                        </svg>
+                    </div>
+                `;
+            }
+
+            // ===== CASE 2: เสาแบบย่อ (Schematic / Arrow) =====
+            if (col.isSchematic) {
+                 return `
+                    <div class="box column-box">
+                        <svg width="${svgWidth}" height="${viewHeight}" xmlns="http://www.w3.org/2000/svg">
+                            <!-- ชื่อเสา -->
+                            <text x="${svgWidth/2}" y="50" font-size="32" fill="red" font-weight="bold" text-anchor="middle">${col.name}</text>
+                            
+                            <!-- ลูกศรชี้ขึ้น (Arrow) -->
+                            <!-- ใช้ svgWidth/2 เป็นแกนกลาง -->
+                            <g transform="translate(${svgWidth/2}, ${startY + col.height/2}) scale(2)">
+                                <path d="M 0 -20 L 0 20 M -10 -10 L 0 -20 L 10 -10" 
+                                      stroke="#333" stroke-width="2" fill="none" />
+                            </g>
+                            
+                             <!-- Text บอกความหมาย -->
+                             <text x="${svgWidth/2}" y="${startY + col.height/2 + 60}" font-size="16" fill="#666" text-anchor="middle">Typical</text>
+                        </svg>
+                    </div>
+                `;
+            }
+
+            // ===== CASE 3: เสาปกติ (Normal) =====
             return `
                 <div class="box column-box">
-                    <svg width="600" height="${viewHeight}" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="${svgWidth}" height="${viewHeight}" xmlns="http://www.w3.org/2000/svg">
                         
                         <defs>
                             <marker id="${uniqueId}" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
@@ -518,6 +686,15 @@
         const appContainer = document.getElementById('app');
         let fullContentHTML = "";
 
+        // ===== คำนวณความกว้างเสาสูงสุดจากทุก Zone (เพื่อให้ทุก Box มีความกว้างเท่ากัน) =====
+        let globalMaxColumnWidth = 0;
+        projectData.forEach(zone => {
+            zone.columns.forEach(col => {
+                if (col.width > globalMaxColumnWidth) globalMaxColumnWidth = col.width;
+            });
+        });
+        const unifiedSvgWidth = Math.max(CONFIG.startX + globalMaxColumnWidth + 250, 600);
+
         // วนลูปทีละ "โซนชั้น" (Zone)
         projectData.forEach(zone => {
             
@@ -525,13 +702,17 @@
             const refHeight = zone.columns[0].height;
             
             // คำนวณความสูงรวมทั้งหมด (Height + Base + Max Section Height)
-            // หาความสูง Section ที่มากที่สุดใน Zone นี้ (เผื่อเสาขนาดไม่เท่ากัน)
+            // หาความสูง Section ที่มากที่สุดใน Zone นี้ (เผื่อเสาขนาดไม่เท่ากัน หรือเป็นเสาหยุด/Schematic)
             let maxSectionHeight = 0;
             zone.columns.forEach(c => {
-                 const currentSecH = c.width + 150; // logic เดียวกับใน fn เดิม
-                 if(currentSecH > maxSectionHeight) maxSectionHeight = currentSecH;
+                 if (!c.isTerminated && !c.isSchematic) { // คำนวณเฉพาะเสาที่มี Section
+                     const currentSecH = c.width + 150; 
+                     if(currentSecH > maxSectionHeight) maxSectionHeight = currentSecH;
+                 }
             });
-            const totalViewHeight = refHeight + CONFIG.baseSvgHeight + maxSectionHeight;
+            // ถ้าเป็นเสาหยุดหมด ความสูง Section เป็น 0 แต่เราควรเผื่อไว้นิดหน่อยเพื่อความสวยงาม หรือใช้ 0 เลยก็ได้
+            // ให้มีขั้นต่ำ viewHeight สักหน่อย
+            const totalViewHeight = Math.max(refHeight + CONFIG.baseSvgHeight + maxSectionHeight, 600);
 
             // 4.2 สร้าง HTML ส่วนหัวของ Zone
             fullContentHTML += `
@@ -547,7 +728,7 @@
             zone.columns.forEach(col => {
                 // เช็คว่าเป็น Zone Foundation หรือไม่ (Zone-0)
                 const isFoundation = (zone.zoneId === "zone-0");
-                fullContentHTML += generateColumnSVG(col, isFoundation, totalViewHeight);
+                fullContentHTML += generateColumnSVG(col, isFoundation, totalViewHeight, unifiedSvgWidth);
             });
 
             // ปิด Tag ของ Zone
