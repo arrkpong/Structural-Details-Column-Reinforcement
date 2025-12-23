@@ -135,7 +135,7 @@
         // 3. FUNCTIONS (ฟังก์ชันวาด)
         // ==========================================
 
-        // 3.0 ฟังก์ชันวาดเหล็กเสริมใน Elevation View
+            // 3.0 ฟังก์ชันวาดเหล็กเสริมใน Elevation View
         function generateRebarElevation(col, startX, startY, uniqueId, isFoundation) {
             let rebarSVG = '';
             
@@ -321,15 +321,114 @@
             return rebarSVG;
         }
 
+        // 3.0.1 ฟังก์ชันวาด Section View (รูปตัดขวาง)
+        function generateSectionView(col, startX, startY) {
+            let sectionSVG = '';
+            const cover = 40; // Cover จริง 40mm (Scale 1px=1mm ไปเลยเพื่อง่าย)
+            
+            // 1. วาด Concrete Outline (ใช้วงกลมนิดๆ ให้ดูมนสมจริงงานเขียนแบบ)
+            sectionSVG += `<rect x="${startX}" y="${startY}" width="${col.width}" height="${col.width}" 
+                           fill="#f0f0f0" stroke="black" stroke-width="4" rx="5" ry="5"/>`;
+
+            // 2. วาด Stirrup (เหล็กปลอก) - Outline ด้านใน
+            const tieX = startX + cover;
+            const tieY = startY + cover;
+            const tieSize = col.width - (2 * cover);
+            
+            // ปลอกเดี่ยว (Single Tie)
+            sectionSVG += `<rect x="${tieX}" y="${tieY}" width="${tieSize}" height="${tieSize}" 
+                           fill="none" stroke="#4169E1" stroke-width="3" rx="5" ry="5"/>`;
+                           
+            // Hook ของปลอก (135 องศา - แบบง่าย)
+            sectionSVG += `<path d="M ${tieX + 10} ${tieY + 10} L ${tieX - 5} ${tieY - 5}" stroke="#4169E1" stroke-width="3"/>`;
+            sectionSVG += `<path d="M ${tieX + 10} ${tieY + 20} L ${tieX + 20} ${tieY + 10}" stroke="#4169E1" stroke-width="3"/>`;
+
+            // 3. วาด Main Bars (จุดวงกลม)
+            // Parse ข้อมูล
+            const mainBarMatch = col.mainBar.match(/(\d+)-DB(\d+)/);
+            const numBars = mainBarMatch ? parseInt(mainBarMatch[1]) : 8;
+            const barSize = mainBarMatch ? parseInt(mainBarMatch[2]) : 20;
+            const barRadius = Math.max(barSize / 2, 4); // รัศมีวงกลมเหล็กในรูปตัด
+            
+            // คำนวณตำแหน่งเหล็ก
+            // 4 มุมเสมอ
+            const corners = [
+                {x: tieX, y: tieY}, // Top-Left
+                {x: tieX + tieSize, y: tieY}, // Top-Right
+                {x: tieX + tieSize, y: tieY + tieSize}, // Bottom-Right
+                {x: tieX, y: tieY + tieSize} // Bottom-Left
+            ];
+            
+            // วาดเหล็กมุม 4 เส้น
+            corners.forEach(p => {
+                sectionSVG += `<circle cx="${p.x}" cy="${p.y}" r="${barRadius}" fill="#DC143C" stroke="black" stroke-width="1"/>`;
+            });
+            
+            // เหล็กข้าง (Side bars)
+            if (numBars > 4) {
+                const remainingBars = numBars - 4;
+                const barsPerSide = remainingBars / 4; // สมมติกระจายเท่ากัน 4 ด้าน (เบื้องต้น)
+                // ตรวจสอบว่าหารลงตัวไหม ถ้าไม่ลงอาจจะต้อง logic ซับซ้อนกว่านี้ (เอาแบบง่ายก่อนนะ)
+                const perSideInt = Math.ceil(barsPerSide); 
+                
+                // ระยะห่างระหว่างเหล็กแกน
+                const spacing = tieSize / (perSideInt + 1);
+                
+                // Top & Bottom Sides
+                for(let i=1; i<=perSideInt; i++) {
+                     // Top
+                     sectionSVG += `<circle cx="${tieX + spacing*i}" cy="${tieY}" r="${barRadius}" fill="#DC143C" stroke="black" stroke-width="1"/>`;
+                     // Bottom
+                     sectionSVG += `<circle cx="${tieX + spacing*i}" cy="${tieY + tieSize}" r="${barRadius}" fill="#DC143C" stroke="black" stroke-width="1"/>`;
+                     // Left
+                     sectionSVG += `<circle cx="${tieX}" cy="${tieY + spacing*i}" r="${barRadius}" fill="#DC143C" stroke="black" stroke-width="1"/>`;
+                     // Right
+                     sectionSVG += `<circle cx="${tieX + tieSize}" cy="${tieY + spacing*i}" r="${barRadius}" fill="#DC143C" stroke="black" stroke-width="1"/>`;
+                }
+            }
+            
+            // 4. ข้อความ SECTION A-A
+            sectionSVG += `<text x="${startX + col.width/2}" y="${startY + col.width + 50}" 
+                           font-size="24" fill="black" font-weight="bold" text-anchor="middle" text-decoration="underline">SECTION A-A</text>`;
+
+            // 5. Dimension รอบรูปตัด (Dimensions for Section View)
+            const dimOffset = 30;
+            const tickSize = 5;
+            const dimColor = "red";
+            
+            // 5.1 Horizontal Dimension (Top)
+            const dimY_top = startY - dimOffset;
+            sectionSVG += `
+                <g stroke="${dimColor}" stroke-width="1">
+                    <line x1="${startX}" y1="${dimY_top}" x2="${startX + col.width}" y2="${dimY_top}" marker-start="url(#tick-dim)" marker-end="url(#tick-dim)"/>
+                    <line x1="${startX}" y1="${startY}" x2="${startX}" y2="${dimY_top - tickSize}" />
+                    <line x1="${startX + col.width}" y1="${startY}" x2="${startX + col.width}" y2="${dimY_top - tickSize}" />
+                    <text x="${startX + col.width/2}" y="${dimY_top - 8}" fill="${dimColor}" font-size="16" text-anchor="middle">${col.width}</text>
+                </g>
+            `;
+            
+            // 5.2 Vertical Dimension (Left)
+            const dimX_left = startX - dimOffset;
+            sectionSVG += `
+                <g stroke="${dimColor}" stroke-width="1">
+                    <line x1="${dimX_left}" y1="${startY}" x2="${dimX_left}" y2="${startY + col.width}" marker-start="url(#tick-dim)" marker-end="url(#tick-dim)"/>
+                    <line x1="${startX}" y1="${startY}" x2="${dimX_left - tickSize}" y2="${startY}" />
+                    <line x1="${startX}" y1="${startY + col.width}" x2="${dimX_left - tickSize}" y2="${startY + col.width}" />
+                    
+                    <text x="${dimX_left - 8}" y="${startY + col.width/2}" fill="${dimColor}" font-size="16" text-anchor="middle" transform="rotate(-90, ${dimX_left - 8}, ${startY + col.width/2})">${col.width}</text>
+                </g>
+            `;
+
+            return sectionSVG;
+        }
 
         // 3.1 ฟังก์ชันสร้าง Story Box (บอกระดับชั้น)
-        function generateStoryBox(topText, bottomText, height) {
-            const svgHeight = height + CONFIG.baseSvgHeight;
+        function generateStoryBox(topText, bottomText, height, viewHeight) {
             const { startY } = CONFIG;
             
             return `
                 <div class="box story-box">
-                    <svg width="250" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="250" height="${viewHeight}" xmlns="http://www.w3.org/2000/svg">
                         <text x="125" y="50" font-size="24" fill="blue" font-weight="bold" text-anchor="middle">${topText}</text>
                         <line x1="20" y1="${startY}" x2="230" y2="${startY}" stroke="blue" stroke-width="2" stroke-dasharray="10,5"/>
 
@@ -340,18 +439,22 @@
             `;
         }
 
-        // 3.2 ฟังก์ชันสร้าง Column Box (วาดเสา + Dimensions)
-        function generateColumnSVG(col, isFoundation = false) {
+        // 3.2 ฟังก์ชันสร้าง Column Box (วาดเสา + Dimensions + Section)
+        function generateColumnSVG(col, isFoundation = false, viewHeight) {
             const { startX, startY, dimOffset, textPadding } = CONFIG;
-            const svgHeight = col.height + CONFIG.baseSvgHeight; // SVG ยืดหดตามความสูงเสา
-            const uniqueId = `tick-${col.name}-${Math.floor(Math.random() * 1000)}`; // สร้าง ID ไม่ซ้ำ
+            
+            const uniqueId = `tick-${col.name}-${Math.floor(Math.random() * 1000)}`; 
 
             return `
                 <div class="box column-box">
-                    <svg width="600" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="600" height="${viewHeight}" xmlns="http://www.w3.org/2000/svg">
                         
                         <defs>
                             <marker id="${uniqueId}" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+                                <line x1="2" y1="10" x2="10" y2="2" stroke="red" stroke-width="2" />
+                            </marker>
+                            <!-- Global Marker for Section Dimensions (ถ้ายังไม่มี) -->
+                            <marker id="tick-dim" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
                                 <line x1="2" y1="10" x2="10" y2="2" stroke="red" stroke-width="2" />
                             </marker>
                         </defs>
@@ -389,9 +492,13 @@
                             <text x="${startX}" y="${startY + col.height + textPadding + 100}">COVER : ${col.cover}</text>
                         </g>
 
-                        <!-- View Title -->
+                        <!-- View Title (Elevation) -->
                         <text x="${startX + col.width/2}" y="${startY + col.height + textPadding + 160}" 
                               font-size="24" fill="black" font-weight="bold" text-anchor="middle" text-decoration="underline">ELEVATION VIEW</text>
+
+                         <!-- ====== SECTION VIEW ====== -->
+                         <!-- วาด Section ต่อท้ายด้านล่าง -->
+                         ${generateSectionView(col, startX, startY + col.height + textPadding + 220)}
 
                     </svg>
                 </div>
@@ -408,8 +515,16 @@
         projectData.forEach(zone => {
             
             // 4.1 หาความสูงอ้างอิงของชั้นนี้ (ใช้เสาต้นแรกเป็นเกณฑ์)
-            // (ในทางปฏิบัติควรใช้ค่าความสูงจริงของชั้นนั้นๆ)
             const refHeight = zone.columns[0].height;
+            
+            // คำนวณความสูงรวมทั้งหมด (Height + Base + Max Section Height)
+            // หาความสูง Section ที่มากที่สุดใน Zone นี้ (เผื่อเสาขนาดไม่เท่ากัน)
+            let maxSectionHeight = 0;
+            zone.columns.forEach(c => {
+                 const currentSecH = c.width + 150; // logic เดียวกับใน fn เดิม
+                 if(currentSecH > maxSectionHeight) maxSectionHeight = currentSecH;
+            });
+            const totalViewHeight = refHeight + CONFIG.baseSvgHeight + maxSectionHeight;
 
             // 4.2 สร้าง HTML ส่วนหัวของ Zone
             fullContentHTML += `
@@ -418,14 +533,14 @@
                     <div class="drawing-row">
             `;
 
-            // 4.3 ใส่ Story Box (ซ้ายสุด) แค่ครั้งเดียว
-            fullContentHTML += generateStoryBox(zone.topLevel, zone.bottomLevel, refHeight);
+            // 4.3 ใส่ Story Box (ซ้ายสุด)
+            fullContentHTML += generateStoryBox(zone.topLevel, zone.bottomLevel, refHeight, totalViewHeight);
 
             // 4.4 วนลูปใส่เสา (Columns)
             zone.columns.forEach(col => {
                 // เช็คว่าเป็น Zone Foundation หรือไม่ (Zone-0)
                 const isFoundation = (zone.zoneId === "zone-0");
-                fullContentHTML += generateColumnSVG(col, isFoundation);
+                fullContentHTML += generateColumnSVG(col, isFoundation, totalViewHeight);
             });
 
             // ปิด Tag ของ Zone
