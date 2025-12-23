@@ -91,74 +91,14 @@
         /* ปัจจุบันใช้ .box เป็นพื้นฐาน */
         /* .column-box { } */
 
-        /* ---------- 9. Zoom/Pan Controls ---------- */
-        .zoom-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            z-index: 1000;
-            background: rgba(255,255,255,0.9);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        .zoom-controls button {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-        }
-        .zoom-controls button:hover {
-            background: #e9ecef;
-        }
-        .zoom-controls span {
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-        }
-
-        /* ---------- 10. Viewport Container สำหรับ Zoom/Pan ---------- */
-        .viewport {
-            overflow: hidden;
-            position: relative;
-            cursor: grab;
-            width: 100%;
-            height: calc(100vh - 100px); /* เต็มหน้าจอ ลบส่วนหัว */
-        }
-        .viewport:active {
-            cursor: grabbing;
-        }
-        .zoomable-content {
-            transform-origin: 0 0;
-            transition: transform 0.1s ease-out;
-        }
-
     </style>
 </head>
 <body>
 
     <h1>Structural Details – Column Schedule</h1>
 
-    <!-- Zoom/Pan Controls -->
-    <div class="zoom-controls">
-        <button id="zoomIn" title="Zoom In">+</button>
-        <button id="zoomOut" title="Zoom Out">−</button>
-        <button id="resetZoom" title="Reset">↺</button>
-        <span id="zoomLevel">100%</span>
-    </div>
-
-    <!-- Viewport for Zoom/Pan -->
-    <div class="viewport" id="viewport">
-        <div class="zoomable-content" id="zoomableContent">
-            <div id="app" class="schedule-container"></div>
+    <div id="app" class="schedule-container">
         </div>
-    </div>
 
     <script>
         // ==========================================
@@ -895,95 +835,6 @@
 
         // แสดงผลลัพธ์
         appContainer.innerHTML = fullContentHTML;
-
-        // ==========================================
-        // 5. ZOOM & PAN FUNCTIONALITY
-        // ==========================================
-        const viewport = document.getElementById('viewport');
-        const zoomableContent = document.getElementById('zoomableContent');
-        const zoomInBtn = document.getElementById('zoomIn');
-        const zoomOutBtn = document.getElementById('zoomOut');
-        const resetZoomBtn = document.getElementById('resetZoom');
-        const zoomLevelSpan = document.getElementById('zoomLevel');
-
-        let scale = 1;
-        let panX = 0;
-        let panY = 0;
-        let isPanning = false;
-        let startX, startY;
-
-        const MIN_SCALE = 0.1;
-        const MAX_SCALE = 3;
-        const ZOOM_STEP = 0.1;
-
-        function updateTransform() {
-            zoomableContent.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-            zoomLevelSpan.textContent = Math.round(scale * 100) + '%';
-        }
-
-        // Mouse Wheel Zoom
-        viewport.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
-            const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale + delta));
-            
-            // Zoom toward mouse position
-            const rect = viewport.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            
-            // Adjust pan to zoom toward cursor
-            const scaleChange = newScale / scale;
-            panX = mouseX - (mouseX - panX) * scaleChange;
-            panY = mouseY - (mouseY - panY) * scaleChange;
-            
-            scale = newScale;
-            updateTransform();
-        }, { passive: false });
-
-        // Pan with Mouse Drag
-        viewport.addEventListener('mousedown', (e) => {
-            if (e.button !== 0) return; // Left click only
-            isPanning = true;
-            startX = e.clientX - panX;
-            startY = e.clientY - panY;
-            viewport.style.cursor = 'grabbing';
-        });
-
-        viewport.addEventListener('mousemove', (e) => {
-            if (!isPanning) return;
-            panX = e.clientX - startX;
-            panY = e.clientY - startY;
-            updateTransform();
-        });
-
-        viewport.addEventListener('mouseup', () => {
-            isPanning = false;
-            viewport.style.cursor = 'grab';
-        });
-
-        viewport.addEventListener('mouseleave', () => {
-            isPanning = false;
-            viewport.style.cursor = 'grab';
-        });
-
-        // Button Controls
-        zoomInBtn.addEventListener('click', () => {
-            scale = Math.min(MAX_SCALE, scale + ZOOM_STEP);
-            updateTransform();
-        });
-
-        zoomOutBtn.addEventListener('click', () => {
-            scale = Math.max(MIN_SCALE, scale - ZOOM_STEP);
-            updateTransform();
-        });
-
-        resetZoomBtn.addEventListener('click', () => {
-            scale = 1;
-            panX = 0;
-            panY = 0;
-            updateTransform();
-        });
 
     </script>
 </body>
