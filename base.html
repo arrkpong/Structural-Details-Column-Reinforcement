@@ -86,10 +86,10 @@
                 topLevel: "2nd Floor (+7.00)",
                 bottomLevel: "1st Floor (+3.50)",
                 columns: [
-                    { name: "C01", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
-                    { name: "C02", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
-                    { name: "C03", height: 2000, width: 300, mainBar: "16-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
-                    { name: "C04", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB8@150", tieBar: "RB6@150" ,extra: "N/A", cover: "40mm"},
+                    { name: "C01", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
+                    { name: "C02", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
+                    { name: "C03", height: 2000, width: 300, mainBar: "16-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
+                    { name: "C04", height: 2000, width: 250, mainBar: "12-DB20", confinementBar: "RB9@100", tieBar: "RB6@150", extra: "N/A", cover: "40mm"},
                 ]
             },
             // --- ZONE 1: Basement ไป 1st Floor ---
@@ -99,10 +99,10 @@
                 topLevel: "1st Floor (+3.50)",
                 bottomLevel: "Basement (+0.00)",
                 columns: [
-                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
-                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
-                    { name: "C03", height: 2000, width: 300, mainBar: "20-DB25", tieBar: "RB9@100" },
-                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C03", height: 2000, width: 300, mainBar: "20-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
                 ]
             },
             // --- ZONE 0: Foundation ไป Basement ---
@@ -112,10 +112,10 @@
                 topLevel: "Basement (+0.00)",
                 bottomLevel: "Foundation (-2.00)",
                 columns: [
-                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
-                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
-                    { name: "C03", height: 2000, width: 300, mainBar: "24-DB25", tieBar: "RB9@100" },
-                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", tieBar: "RB9@100" },
+                    { name: "C01", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C02", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C03", height: 2000, width: 300, mainBar: "24-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
+                    { name: "C04", height: 2000, width: 300, mainBar: "16-DB25", confinementBar: "RB9@75", tieBar: "RB9@150", extra: "N/A", cover: "40mm" },
                 ]
             }
         ];
@@ -134,6 +134,193 @@
         // ==========================================
         // 3. FUNCTIONS (ฟังก์ชันวาด)
         // ==========================================
+
+        // 3.0 ฟังก์ชันวาดเหล็กเสริมใน Elevation View
+        function generateRebarElevation(col, startX, startY, uniqueId, isFoundation) {
+            let rebarSVG = '';
+            
+            // ===== Parse ข้อมูลเหล็กจาก string =====
+            // Main Bar: เช่น "12-DB20" -> จำนวน 12 ขนาด DB20
+            const mainBarMatch = col.mainBar.match(/(\d+)-DB(\d+)/);
+            const mainBarCount = mainBarMatch ? parseInt(mainBarMatch[1]) : 8;
+            const mainBarSize = mainBarMatch ? parseInt(mainBarMatch[2]) : 20;
+            
+            // Tie/Stirrup: เช่น "RB9@100" -> ขนาด RB9 ระยะห่าง 100mm
+            const tieMatch = col.tieBar ? col.tieBar.match(/RB(\d+)@(\d+)/) : null;
+            const tieSpacing = tieMatch ? parseInt(tieMatch[2]) : 150;
+            
+            // Confinement Bar (ถ้ามี)
+            const confMatch = col.confinementBar ? col.confinementBar.match(/RB(\d+)@(\d+)/) : null;
+            const confSpacing = confMatch ? parseInt(confMatch[2]) : tieSpacing;
+            
+            // ===== COVER ระยะหุ้ม =====
+            const cover = 15; // ใช้ค่าประมาณ 15px เพื่อความสวยงาม
+            
+            // ===== วาดเหล็กหลัก (Main Bars) - แนวตั้ง =====
+            // สมมติว่าเหล็กหลักอยู่ที่ขอบใกล้ทั้ง 2 ด้าน
+            const mainBarRadius = Math.max(mainBarSize / 4, 3); // ความหนาเส้นเหล็กหลัก
+            
+            // คำนวณจำนวนเหล็กต่อด้าน (สมมติแบ่งครึ่ง)
+            const barsPerSide = Math.ceil(mainBarCount / 4); // เหล็กมุม + เหล็กกลาง
+            
+            // เหล็กหลักด้านซ้าย
+            const leftX = startX + cover;
+            if (isFoundation) {
+                // วาดเหล็กงอฉาก (L-Shape) หันออกซ้าย
+                rebarSVG += `<path d="M ${leftX} ${startY + cover} L ${leftX} ${startY + col.height - cover} L ${leftX - 20} ${startY + col.height - cover}" 
+                             stroke="#DC143C" stroke-width="${mainBarRadius}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+            } else {
+                rebarSVG += `<line x1="${leftX}" y1="${startY + cover}" x2="${leftX}" y2="${startY + col.height - cover}" 
+                             stroke="#DC143C" stroke-width="${mainBarRadius}" stroke-linecap="round"/>`;
+            }
+            
+            // เหล็กหลักด้านขวา
+            const rightX = startX + col.width - cover;
+            if (isFoundation) {
+                // วาดเหล็กงอฉาก (L-Shape) หันออกขวา
+                rebarSVG += `<path d="M ${rightX} ${startY + cover} L ${rightX} ${startY + col.height - cover} L ${rightX + 20} ${startY + col.height - cover}" 
+                             stroke="#DC143C" stroke-width="${mainBarRadius}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+            } else {
+                rebarSVG += `<line x1="${rightX}" y1="${startY + cover}" x2="${rightX}" y2="${startY + col.height - cover}" 
+                             stroke="#DC143C" stroke-width="${mainBarRadius}" stroke-linecap="round"/>`;
+            }
+            
+            // เหล็กหลักตรงกลาง (ถ้ามีมากกว่า 4 เส้น)
+            if (mainBarCount > 4) {
+                const middleBarsCount = Math.min(Math.floor((mainBarCount - 4) / 2), 3);
+                const spacing = (col.width - 2 * cover) / (middleBarsCount + 1);
+                for (let i = 1; i <= middleBarsCount; i++) {
+                    const midX = startX + cover + spacing * i;
+                    rebarSVG += `<line x1="${midX}" y1="${startY + cover}" x2="${midX}" y2="${startY + col.height - cover}" 
+                                 stroke="#DC143C" stroke-width="${mainBarRadius - 1}" stroke-linecap="round" stroke-dasharray="4,2"/>`;
+                }
+            }
+            
+            // ===== กำหนด Confinement Zone (ตาม ACI 318) =====
+            // Lo = max(h/6, 450mm, max column dimension)
+            // สำหรับการแสดงผล ใช้ประมาณ 25% ของความสูงเสา
+            const confZoneHeight = Math.max(col.height * 0.25, col.width, 450); // ตาม ACI 318
+            const confStrokeWidth = 2;
+            const tieStrokeWidth = 2;
+            
+            // ===== วาดเหล็ก Confinement Zone (หัวเสา) - สีส้ม =====
+            if (col.confinementBar) {
+                const numConfTop = Math.max(Math.floor(confZoneHeight / confSpacing), 2);
+                const confScaledSpacing = confZoneHeight / (numConfTop + 1);
+                
+                for (let i = 0; i <= numConfTop; i++) {
+                    const confY = startY + cover + confScaledSpacing * i;
+                    // เส้นปลอกแนวนอน
+                    rebarSVG += `<line x1="${startX + cover - 5}" y1="${confY}" x2="${startX + col.width - cover + 5}" y2="${confY}" 
+                                 stroke="#8B008B" stroke-width="${confStrokeWidth}"/>`;
+                    // Tick mark ที่ปลายทั้ง 2 ด้าน
+                    rebarSVG += `<line x1="${startX + cover - 5}" y1="${confY - 4}" x2="${startX + cover - 5}" y2="${confY + 4}" 
+                                 stroke="#8B008B" stroke-width="${confStrokeWidth}"/>`;
+                    rebarSVG += `<line x1="${startX + col.width - cover + 5}" y1="${confY - 4}" x2="${startX + col.width - cover + 5}" y2="${confY + 4}" 
+                                 stroke="#8B008B" stroke-width="${confStrokeWidth}"/>`;
+                }
+                
+                // ===== วาดเหล็ก Confinement Zone (ท้ายเสา) - สีส้ม =====
+                for (let i = 0; i <= numConfTop; i++) {
+                    const confY = startY + col.height - cover - confScaledSpacing * i;
+                    // เส้นปลอกแนวนอน
+                    rebarSVG += `<line x1="${startX + cover - 5}" y1="${confY}" x2="${startX + col.width - cover + 5}" y2="${confY}" 
+                                 stroke="#8B008B" stroke-width="${confStrokeWidth}"/>`;
+                    // Tick mark ที่ปลายทั้ง 2 ด้าน
+                    rebarSVG += `<line x1="${startX + cover - 5}" y1="${confY - 4}" x2="${startX + cover - 5}" y2="${confY + 4}" 
+                                 stroke="#8B008B" stroke-width="${confStrokeWidth}"/>`;
+                    rebarSVG += `<line x1="${startX + col.width - cover + 5}" y1="${confY - 4}" x2="${startX + col.width - cover + 5}" y2="${confY + 4}" 
+                                 stroke="#8B008B" stroke-width="${confStrokeWidth}"/>`;
+                }
+            }
+            
+            // ===== วาดเหล็กปลอก Normal Zone (กลางเสา) - สีน้ำเงิน =====
+            const normalZoneStart = startY + cover + confZoneHeight;
+            const normalZoneEnd = startY + col.height - cover - confZoneHeight;
+            const normalZoneHeight = normalZoneEnd - normalZoneStart;
+            
+            if (normalZoneHeight > 0) {
+                const numTies = Math.max(Math.floor(normalZoneHeight / tieSpacing), 1);
+                const scaledSpacing = normalZoneHeight / (numTies + 1);
+                
+                for (let i = 1; i <= numTies; i++) {
+                    const tieY = normalZoneStart + scaledSpacing * i;
+                    // เส้นปลอกแนวนอน
+                    rebarSVG += `<line x1="${startX + cover - 5}" y1="${tieY}" x2="${startX + col.width - cover + 5}" y2="${tieY}" 
+                                 stroke="#4169E1" stroke-width="${tieStrokeWidth}"/>`;
+                    // Tick mark ที่ปลายทั้ง 2 ด้าน
+                    rebarSVG += `<line x1="${startX + cover - 5}" y1="${tieY - 4}" x2="${startX + cover - 5}" y2="${tieY + 4}" 
+                                 stroke="#4169E1" stroke-width="${tieStrokeWidth}"/>`;
+                    rebarSVG += `<line x1="${startX + col.width - cover + 5}" y1="${tieY - 4}" x2="${startX + col.width - cover + 5}" y2="${tieY + 4}" 
+                                 stroke="#4169E1" stroke-width="${tieStrokeWidth}"/>`;
+                }
+            }
+            
+            // ===== เหล็กปลอกบนสุดและล่างสุด =====
+            const topTieY = startY + cover;
+            const bottomTieY = startY + col.height - cover;
+            
+            rebarSVG += `<line x1="${startX + cover - 5}" y1="${topTieY}" x2="${startX + col.width - cover + 5}" y2="${topTieY}" 
+                         stroke="#4169E1" stroke-width="${tieStrokeWidth}"/>`;
+            rebarSVG += `<line x1="${startX + cover - 5}" y1="${bottomTieY}" x2="${startX + col.width - cover + 5}" y2="${bottomTieY}" 
+                         stroke="#4169E1" stroke-width="${tieStrokeWidth}"/>`;
+            
+            // ===== เพิ่ม Dimension Bar ด้านขวา (Rebar Spacing) =====
+            const dimX = startX + col.width + 30; // ขยับออกมาทางขวา 30px
+            const dimColor = "red"; // ใช้สีแดงตามเสา
+            const dimFontSize = 18; // ขนาดฟอนต์ตามเสา
+            
+            // Note: ใช้ marker-start และ marker-end ที่มีอยู่แล้ว (uniqueId)
+            
+            // 1. Dimension - Confinement Top
+            const confTopY = startY + cover + confZoneHeight;
+            rebarSVG += `
+                <g stroke="${dimColor}" stroke-width="2">
+                    <!-- เส้นบอกระยะ -->
+                    <line x1="${dimX}" y1="${startY}" x2="${dimX}" y2="${confTopY}" marker-start="url(#${uniqueId})" marker-end="url(#${uniqueId})" />
+                    <!-- เส้น Extension line แนวนอน -->
+                    <line x1="${startX + col.width}" y1="${startY}" x2="${dimX + 10}" y2="${startY}" stroke-width="1" stroke-dasharray="4,2" />
+                    <line x1="${startX + col.width}" y1="${confTopY}" x2="${dimX + 10}" y2="${confTopY}" stroke-width="1" stroke-dasharray="4,2" />
+                    <!-- ข้อความ -->
+                    <text x="${dimX + 15}" y="${startY + confZoneHeight/2}" fill="${dimColor}" font-size="${dimFontSize}" dominant-baseline="middle" text-anchor="start">
+                        Conf. @${confSpacing}
+                    </text>
+                </g>
+            `;
+            
+            // 2. Dimension - Normal Zone (Middle)
+            const normalStart = confTopY;
+            const normalEnd = startY + col.height - cover - confZoneHeight;
+            
+            // ป้องกันกรณีทับซ้อนถ้า Normal Zone เล็กมาก
+            if (normalEnd > normalStart) {
+                 rebarSVG += `
+                    <g stroke="${dimColor}" stroke-width="2">
+                        <line x1="${dimX}" y1="${normalStart}" x2="${dimX}" y2="${normalEnd}" marker-start="url(#${uniqueId})" marker-end="url(#${uniqueId})" />
+                        <line x1="${startX + col.width}" y1="${normalEnd}" x2="${dimX + 10}" y2="${normalEnd}" stroke-width="1" stroke-dasharray="4,2" />
+                        <text x="${dimX + 15}" y="${normalStart + (normalEnd-normalStart)/2}" fill="${dimColor}" font-size="${dimFontSize}" dominant-baseline="middle" text-anchor="start">
+                            Tie @${tieSpacing}
+                        </text>
+                    </g>
+                `;
+            }
+
+            // 3. Dimension - Confinement Bottom
+            const confBotStart = normalEnd;
+            const confBotEnd = startY + col.height;
+            rebarSVG += `
+                <g stroke="${dimColor}" stroke-width="2">
+                    <line x1="${dimX}" y1="${confBotStart}" x2="${dimX}" y2="${confBotEnd}" marker-start="url(#${uniqueId})" marker-end="url(#${uniqueId})" />
+                    <line x1="${startX + col.width}" y1="${confBotEnd}" x2="${dimX + 10}" y2="${confBotEnd}" stroke-width="1" stroke-dasharray="4,2" />
+                    <text x="${dimX + 15}" y="${confBotStart + (confBotEnd-confBotStart)/2}" fill="${dimColor}" font-size="${dimFontSize}" dominant-baseline="middle" text-anchor="start">
+                        Conf. @${confSpacing}
+                    </text>
+                </g>
+            `;
+
+            return rebarSVG;
+        }
+
 
         // 3.1 ฟังก์ชันสร้าง Story Box (บอกระดับชั้น)
         function generateStoryBox(topText, bottomText, height) {
@@ -154,14 +341,14 @@
         }
 
         // 3.2 ฟังก์ชันสร้าง Column Box (วาดเสา + Dimensions)
-        function generateColumnSVG(col) {
+        function generateColumnSVG(col, isFoundation = false) {
             const { startX, startY, dimOffset, textPadding } = CONFIG;
             const svgHeight = col.height + CONFIG.baseSvgHeight; // SVG ยืดหดตามความสูงเสา
             const uniqueId = `tick-${col.name}-${Math.floor(Math.random() * 1000)}`; // สร้าง ID ไม่ซ้ำ
 
             return `
                 <div class="box column-box">
-                    <svg width="550" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="600" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
                         
                         <defs>
                             <marker id="${uniqueId}" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
@@ -173,6 +360,9 @@
 
                         <rect x="${startX}" y="${startY}" width="${col.width}" height="${col.height}" 
                               fill="none" stroke="black" stroke-width="4"/>
+
+                        <!-- ====== REBAR IN ELEVATION VIEW ====== -->
+                        ${generateRebarElevation(col, startX, startY, uniqueId, isFoundation)}
 
                         <g stroke="red" stroke-width="2">
                             <line x1="${startX}" y1="${startY}" x2="${startX}" y2="${startY - dimOffset - 15}" stroke-width="1"/>
@@ -198,6 +388,10 @@
                             <text x="${startX}" y="${startY + col.height + textPadding + 75}">EXTRA : ${col.extra}</text>
                             <text x="${startX}" y="${startY + col.height + textPadding + 100}">COVER : ${col.cover}</text>
                         </g>
+
+                        <!-- View Title -->
+                        <text x="${startX + col.width/2}" y="${startY + col.height + textPadding + 160}" 
+                              font-size="24" fill="black" font-weight="bold" text-anchor="middle" text-decoration="underline">ELEVATION VIEW</text>
 
                     </svg>
                 </div>
@@ -229,7 +423,9 @@
 
             // 4.4 วนลูปใส่เสา (Columns)
             zone.columns.forEach(col => {
-                fullContentHTML += generateColumnSVG(col);
+                // เช็คว่าเป็น Zone Foundation หรือไม่ (Zone-0)
+                const isFoundation = (zone.zoneId === "zone-0");
+                fullContentHTML += generateColumnSVG(col, isFoundation);
             });
 
             // ปิด Tag ของ Zone
