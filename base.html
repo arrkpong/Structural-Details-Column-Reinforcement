@@ -222,8 +222,130 @@
            ในแต่ละ Zone จะมี "เสา" (Columns) อยู่ข้างใน
         */
         const projectData = [
+            //  --- 30th Floor ---
+            {
+                zoneId: "L30-LF",
+                title: "30th Floor to Roof",
+                topLevel: "Roof (+90.00m)",
+                bottomLevel: "30th Fl. (+87.00m)",
+                columns: [
+                    { name:"C01", isTerminated:true },
+                    { name:"C02", isTerminated:true },
+                    { name:"C03", isTerminated:true },
+                    { name:"C04", isTerminated:true },
+                    { name:"C05", isTerminated:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
 
+            // --- 29th Floor ---
+            {
+                zoneId: "L29-L30",
+                title: "29th Floor to 30th Floor",
+                topLevel: "30th Fl. (+90.00m)",
+                bottomLevel: "29th Fl. (+87.00m)",
+                columns: [
+                    { name:"C01", height:1650, width:250, mainBar:"12-DB25+6-DB20", confinementBar:"1-HP-DB10@150", tieBar:"4-RB9@300", extra:"N/A", cover:"40mm" },
+                    { name:"C02", height:1200, width:525, mainBar:"16-DB25", confinementBar:"2-HP-DB12@200", tieBar:"4-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C03", height:900, width:500, mainBar:"16-DB28@200", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C04", height:900, width:500, mainBar:"14-DB25", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C05", isTerminated:true },
+                    { name:"C07", height:950, width:350, mainBar:"16-DB25", confinementBar:"1-HP-DB12@150", tieBar:"2-RB9@300", extra:"N/A", cover:"40mm" },
+                ]
+            },
+            // --- 28th Floor ---
+            {
+                zoneId: "L28-L29",
+                title: "28th Floor to 29th Floor",
+                topLevel: "29th Fl. (+87.00m)",
+                bottomLevel: "28th Fl. (+84.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", height:900, width:350, mainBar:"10-DB25", confinementBar:"1-HP-DB12@150", tieBar:"2-RB9@300", extra:"N/A", cover:"40mm" },
+                    { name:"C07", height:950, width:350, mainBar:"16-DB25", confinementBar:"1-HP-DB12@150", tieBar:"2-RB9@300", extra:"N/A", cover:"40mm" },
+                ]
+            },
+            // --- 27th Floor ---
+            {
+                zoneId: "L27-L28",
+                title: "27th Floor to 28th Floor",
+                topLevel: "28th Fl. (+84.00m)",
+                bottomLevel: "27th Fl. (+81.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+            // --- 26th Floor ---
+            {
+                zoneId: "L26-L27",
+                title: "26th Floor to 27th Floor",
+                topLevel: "27th Fl. (+81.00m)",
+                bottomLevel: "26th Fl. (+78.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
 
+            // --- 25th Floor ---
+            {
+                zoneId: "L25-L26",
+                title: "25th Floor to 26th Floor",
+                topLevel: "26th Fl. (+78.00m)",
+                bottomLevel: "25th Fl. (+75.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 24th Floor ---
+            {
+                zoneId: "L24-L25",
+                title: "24th Floor to 25th Floor",
+                topLevel: "25th Fl. (+75.00m)",
+                bottomLevel: "24th Fl. (+72.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 23rd Floor ---
+            {
+                zoneId: "L23-L24",
+                title: "23rd Floor to 24th Floor",
+                topLevel: "24th Fl. (+72.00m)",
+                bottomLevel: "23rd Fl. (+69.00m)",
+                columns: [
+                    { name:"C01", height:1650, width:250, mainBar:"12-DB25+6-DB20", confinementBar:"1-HP-DB10@150", tieBar:"4-RB9@300", extra:"N/A", cover:"40mm" },
+                    { name:"C02", height:1200, width:525, mainBar:"16-DB25", confinementBar:"2-HP-DB12@200", tieBar:"4-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C03", height:900, width:750, mainBar:"14-DB28", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C04", height:900, width:750, mainBar:"16-DB25", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C05", height:2100, width:350, mainBar:"24-DB28", confinementBar:"1-HP-DB12@200", tieBar:"9-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C07", height:2150, width:350, mainBar:"18-DB25", confinementBar:"1-HP-DB12@150", tieBar:"7-RB9@300", extra:"N/A", cover:"40mm" },
+                ]
+            },
 
             // --- 22nd Floor ---
             {
@@ -974,6 +1096,8 @@
             if (col.isTerminated) {
                  // ใช้ viewHeight/2 เป็นกึ่งกลางตายตัว เพื่อให้ทุกเสาอยู่ตำแหน่งเดียวกัน
                  const centerY = viewHeight / 2;
+                 // ใช้ default width ถ้าไม่มีค่า
+                 const rectWidth = col.width || 300;
 
                  return `
                     <div class="box column-box">
@@ -983,7 +1107,7 @@
                             
                             <!-- สัญลักษณ์เสาหยุด (Flat Rectangle) -->
                             <!-- วางไว้ตรงกลาง Box -->
-                            <rect x="${svgWidth/2 - col.width/2}" y="${centerY - 10}" width="${col.width}" height="20" 
+                            <rect x="${svgWidth/2 - rectWidth/2}" y="${centerY - 10}" width="${rectWidth}" height="20" 
                                   fill="none" stroke="black" stroke-width="2"/>
                                   
                             <!-- Optional: Text บอกสถานะ -->
