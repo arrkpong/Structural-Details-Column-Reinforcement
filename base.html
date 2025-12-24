@@ -224,7 +224,7 @@
         const projectData = [
             // --- ZONE 11: 10th Floor ---
             {
-                zoneId: "zone-11",
+                zoneId: "L10-L11",
                 title: "10th Floor to 11th Floor",
                 topLevel: "11th Fl. (+33.00m)",
                 bottomLevel: "10th Fl. (+30.00m)",
@@ -240,7 +240,7 @@
 
             // --- ZONE 10: 9th Floor ---
             {
-                zoneId: "zone-10",
+                zoneId: "L9-L10",
                 title: "9th Floor to 10th Floor",
                 topLevel: "10th Fl. (+30.00m)",
                 bottomLevel: "9th Fl. (+27.00m)",
@@ -256,7 +256,7 @@
 
             // --- ZONE 9: 8th Floor ---
             {
-                zoneId: "zone-9",
+                zoneId: "L8-L9",
                 title: "8th Floor to 9th Floor",
                 topLevel: "9th Fl. (+27.00m)",
                 bottomLevel: "8th Fl. (+24.00m)",
@@ -271,7 +271,7 @@
             },
             // --- ZONE 8: 7th Floor ---
             {
-                zoneId: "zone-8",
+                zoneId: "L7-L8",
                 title: "7th Floor to 8th Floor",
                 topLevel: "8th Fl. (+24.00m)",
                 bottomLevel: "7th Fl. (+21.00m)",
@@ -287,7 +287,7 @@
 
             // --- ZONE 7: 6th Floor ---
             {
-                zoneId: "zone-7",
+                zoneId: "L6-L7",
                 title: "6th Floor to 7th Floor",
                 topLevel: "7th Fl. (+21.00m)",
                 bottomLevel: "6th Fl. (+18.00m)",
@@ -302,7 +302,7 @@
             },
             // --- ZONE 6: 5th Floor ---
             {
-                zoneId: "zone-6",
+                zoneId: "L5-L6",
                 title: "5th Floor to 6th Floor",
                 topLevel: "6th Fl. (+18.00m)",
                 bottomLevel: "5th Fl. (+15.00m)",
@@ -318,7 +318,7 @@
 
             // --- ZONE 5: 4th Floor ---
             {
-                zoneId: "zone-5",
+                zoneId: "L4-L5",
                 title: "4th Floor to 5th Floor",
                 topLevel: "5th Fl. (+15.00m)",
                 bottomLevel: "4th Fl. (+12.00m)",
@@ -334,7 +334,7 @@
 
             // --- ZONE 4: 3rd Floor ---
             {
-                zoneId: "zone-4",
+                zoneId: "L3-L4",
                 title: "3rd Floor to 4th Floor",
                 topLevel: "4th Fl. (+12.00m)",
                 bottomLevel: "3rd Fl. (+9.00m)",
@@ -350,7 +350,7 @@
 
             // --- ZONE 3: 2nd Floor ---
             {
-                zoneId: "zone-3",
+                zoneId: "L2-L3",
                 title: "2nd Floor to 3rd Floor",
                 topLevel: "3rd Fl. (+9.00m)",
                 bottomLevel: "2nd Fl. (+6.00m)",
@@ -366,7 +366,7 @@
 
             // --- ZONE 2: 1st Floor ---
             {
-                zoneId: "zone-2",
+                zoneId: "L1-L2",
                 title: "1st Floor to 2nd Floor",
                 topLevel: "2nd Fl. (+6.00m)",
                 bottomLevel: "1st Fl. (+3.00m)",
@@ -382,7 +382,7 @@
             
             // --- ZONE 1: Basement ---
             {
-                zoneId: "zone-1",
+                zoneId: "LB-L1",
                 title: "basement to 1st Floor",
                 topLevel: "1st Fl. (+3.00m)",
                 bottomLevel: "basement (0.00m)",
@@ -397,7 +397,7 @@
             },
             // --- ZONE 0: Foundation ---
             {
-                zoneId: "zone-0",
+                zoneId: "LF-LB",
                 title: "Foundation to basement",
                 topLevel: "basement (0.00m)",
                 bottomLevel: "Foundation (-7.50m)",
@@ -935,8 +935,8 @@
 
             // 4.4 วนลูปใส่เสา (Columns)
             zone.columns.forEach(col => {
-                // เช็คว่าเป็น Zone Foundation หรือไม่ (Zone-0)
-                const isFoundation = (zone.zoneId === "zone-0");
+                // เช็คว่าเป็น Zone Foundation หรือไม่ (LF-LB = Foundation to Basement)
+                const isFoundation = (zone.zoneId === "LF-LB");
                 fullContentHTML += generateColumnSVG(col, isFoundation, totalViewHeight, unifiedSvgWidth);
             });
 
