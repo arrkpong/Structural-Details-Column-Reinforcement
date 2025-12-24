@@ -222,7 +222,202 @@
            ในแต่ละ Zone จะมี "เสา" (Columns) อยู่ข้างใน
         */
         const projectData = [
-            // --- ZONE 11: 10th Floor ---
+
+
+
+            // --- 22nd Floor ---
+            {
+                zoneId: "L22-L23",
+                title: "22nd Floor to 23rd Floor",
+                topLevel: "23rd Fl. (+72.00m)",
+                bottomLevel: "22nd Fl. (+69.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", height:2150, width:350, mainBar:"20-DB25", confinementBar:"1-HP-DB12@250", tieBar:"7-RB9@300", extra:"N/A", cover:"40mm" },
+                ]
+            },
+
+            // --- 21st Floor ---
+            {
+                zoneId: "L21-L22",
+                title: "21st Floor to 22nd Floor",
+                topLevel: "22nd Fl. (+69.00m)",
+                bottomLevel: "21st Fl. (+66.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 20th Floor ---
+            {
+                zoneId: "L20-L21",
+                title: "20th Floor to 21st Floor",
+                topLevel: "21st Fl. (+66.00m)",
+                bottomLevel: "20th Fl. (+63.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 19th Floor ---
+            {
+                zoneId: "L19-L20",
+                title: "19th Floor to 20th Floor",
+                topLevel: "20th Fl. (+63.00m)",
+                bottomLevel: "19th Fl. (+60.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 18th Floor ---
+            {
+                zoneId: "L18-L19",
+                title: "18th Floor to 19th Floor",
+                topLevel: "19th Fl. (+60.00m)",
+                bottomLevel: "18th Fl. (+57.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 17th Floor ---
+            {
+                zoneId: "L17-L18",
+                title: "17th Floor to 18th Floor",
+                topLevel: "18th Fl. (+57.00m)",
+                bottomLevel: "17th Fl. (+54.00m)",
+                columns: [
+                    { name:"C01", height:1650, width:250, mainBar:"12-DB25+6-DB20", confinementBar:"1-HP-DB10@150", tieBar:"4-RB9@300", extra:"N/A", cover:"40mm" },
+                    { name:"C02", height:1200, width:525, mainBar:"18-DB25", confinementBar:"2-HP-DB12@200", tieBar:"4-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C03", height:900, width:750, mainBar:"14-DB28", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C04", height:900, width:750, mainBar:"16-DB25", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C05", height:2100, width:350, mainBar:"24-DB25", confinementBar:"1-HP-DB12@200", tieBar:"9-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C07", height:2150, width:350, mainBar:"24-DB25", confinementBar:"1-HP-DB12@150", tieBar:"7-RB9@200", extra:"N/A", cover:"40mm" },
+                ]
+            },
+
+            // --- 16th Floor ---
+            {
+                zoneId: "L16-L17",
+                title: "16th Floor to 17th Floor",
+                topLevel: "17th Fl. (+54.00m)",
+                bottomLevel: "16th Fl. (+51.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 15Bth Floor ---
+            {
+                zoneId: "L15B-L16",
+                title: "15Bth Floor to 16th Floor",
+                topLevel: "16th Fl. (+51.00m)",
+                bottomLevel: "15Bth Fl. (+48.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 15Ath Floor ---
+            {
+                zoneId: "L15A-L15B",
+                title: "15Ath Floor to 15Bth Floor",
+                topLevel: "15Bth Fl. (+48.00m)",
+                bottomLevel: "15Ath Fl. (+45.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", height:1200, width:525, mainBar:"18-db25", confinementBar:"2-HP-DB12@200", tieBar:"4-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 14th Floor ---
+            {
+                zoneId: "L14-L15A",
+                title: "14th Floor to 15Ath Floor",
+                topLevel: "15Ath Fl. (+45.00m)",
+                bottomLevel: "14th Fl. (+42.00m)",
+                columns: [
+                    { name:"C01", isSchematic:true },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+            
+            // --- 12th Floor ---
+            {
+                zoneId: "L12-L14",
+                title: "12th Floor to 14th Floor",
+                topLevel: "14th Fl. (+42.00m)",
+                bottomLevel: "12th Fl. (+39.00m)",
+                columns: [
+                    { name:"C01", height:1650, width:250, mainBar:"12-DB25+6-DB20", confinementBar:"1-HP-DB10@200", tieBar:"7-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C02", isSchematic:true },
+                    { name:"C03", isSchematic:true },
+                    { name:"C04", isSchematic:true },
+                    { name:"C05", isSchematic:true },
+                    { name:"C07", isSchematic:true },
+                ]
+            },
+
+            // --- 11th Floor ---
+            {
+                zoneId: "L11-L12",
+                title: "11th Floor to 12th Floor",
+                topLevel: "12th Fl. (+36.00m)",
+                bottomLevel: "11th Fl. (+33.00m)",
+                columns: [
+                    { name:"C01", height:1650, width:250, mainBar:"12-DB25+6-DB20", confinementBar:"1-HP-DB10@150", tieBar:"4-RB9@300", extra:"3 H-150x150", cover:"40mm" },
+                    { name:"C02", height:1200, width:750, mainBar:"14-DB32", confinementBar:"2-HP-DB12@200", tieBar:"3-DB12@200", extra:"N/A", cover:"40mm" },
+                    { name:"C03", height:900, width:750, mainBar:"14-DB28", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C04", height:900, width:750, mainBar:"16-DB25", confinementBar:"2-HP-DB12@200", tieBar:"3-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C05", height:2100, width:350, mainBar:"24-DB25", confinementBar:"1-HP-DB12@200", tieBar:"9-RB9@200", extra:"N/A", cover:"40mm" },
+                    { name:"C07", height:2150, width:400, mainBar:"24-DB25+4-DB25", confinementBar:"1-HP-DB12@150", tieBar:"7-DB12@300", extra:"N/A", cover:"40mm" },
+                ]
+            },
+
+            // --- 10th Floor ---
             {
                 zoneId: "L10-L11",
                 title: "10th Floor to 11th Floor",
@@ -238,7 +433,7 @@
                 ]
             },
 
-            // --- ZONE 10: 9th Floor ---
+            // --- 9th Floor ---
             {
                 zoneId: "L9-L10",
                 title: "9th Floor to 10th Floor",
@@ -254,7 +449,7 @@
                 ]
             },
 
-            // --- ZONE 9: 8th Floor ---
+            // --- 8th Floor ---
             {
                 zoneId: "L8-L9",
                 title: "8th Floor to 9th Floor",
@@ -269,7 +464,7 @@
                     { name:"C07", isSchematic:true },
                 ]
             },
-            // --- ZONE 8: 7th Floor ---
+            // --- 7th Floor ---
             {
                 zoneId: "L7-L8",
                 title: "7th Floor to 8th Floor",
@@ -285,7 +480,7 @@
                 ]
             },
 
-            // --- ZONE 7: 6th Floor ---
+            // --- 6th Floor ---
             {
                 zoneId: "L6-L7",
                 title: "6th Floor to 7th Floor",
@@ -300,7 +495,7 @@
                     { name:"C07", isSchematic:true },
                 ]
             },
-            // --- ZONE 6: 5th Floor ---
+            // --- 5th Floor ---
             {
                 zoneId: "L5-L6",
                 title: "5th Floor to 6th Floor",
@@ -316,7 +511,7 @@
                 ]
             },
 
-            // --- ZONE 5: 4th Floor ---
+            // --- 4th Floor ---
             {
                 zoneId: "L4-L5",
                 title: "4th Floor to 5th Floor",
@@ -332,7 +527,7 @@
                 ]
             },
 
-            // --- ZONE 4: 3rd Floor ---
+            // --- 3rd Floor ---
             {
                 zoneId: "L3-L4",
                 title: "3rd Floor to 4th Floor",
@@ -348,7 +543,7 @@
                 ]
             },
 
-            // --- ZONE 3: 2nd Floor ---
+            // --- 2nd Floor ---
             {
                 zoneId: "L2-L3",
                 title: "2nd Floor to 3rd Floor",
@@ -364,7 +559,7 @@
                 ]
             },
 
-            // --- ZONE 2: 1st Floor ---
+            // --- 1st Floor ---
             {
                 zoneId: "L1-L2",
                 title: "1st Floor to 2nd Floor",
@@ -380,7 +575,7 @@
                 ]
             },
             
-            // --- ZONE 1: Basement ---
+            // --- Basement ---
             {
                 zoneId: "LB-L1",
                 title: "basement to 1st Floor",
@@ -395,7 +590,7 @@
                     { name:"C07", isSchematic:true },
                 ]
             },
-            // --- ZONE 0: Foundation ---
+            // --- Foundation ---
             {
                 zoneId: "LF-LB",
                 title: "Foundation to basement",
@@ -406,8 +601,8 @@
                     { name:"C02", height:1200, width:750, mainBar:"14-DB32", confinementBar:"2-HP-DB12@200", tieBar:"3-DB12@200", extra:"-", cover:"40mm" },
                     { name:"C03", height:900, width:750, mainBar:"14-DB28", confinementBar:"2-HP-DB12@200", tieBar:"3-DB9@200", extra:"-", cover:"40mm" },
                     { name:"C04", height:1200, width:750, mainBar:"18-DB25", confinementBar:"1-HP-DB12@150", tieBar:"5-RB9@300", extra:"-", cover:"40mm" },
-                    { name:"C05", height:2100, width:400, mainBar:"24-DB28+4-DB28", confinementBar:"1-HP-DB12@150", tieBar:"7-RB9@300", extra:"4 WF-150X150", cover:"40mm" },
-                    { name:"C07", height:2500, width:450, mainBar:"20-DB25+4-DB25", confinementBar:"1-HP-DB12@150", tieBar:"7-RB12@300", extra:"4 WF-150X150", cover:"40mm" },
+                    { name:"C05", height:2100, width:400, mainBar:"24-DB28+4-DB28", confinementBar:"1-HP-DB12@150", tieBar:"7-RB9@300", extra:"4 WF-150x150", cover:"40mm" },
+                    { name:"C07", height:2500, width:450, mainBar:"20-DB25+4-DB25", confinementBar:"1-HP-DB12@150", tieBar:"7-RB12@300", extra:"4 WF-150x150", cover:"40mm" },
                 ]
             }
         ];
