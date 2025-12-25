@@ -100,6 +100,16 @@
             transform-origin: top left;
             scrollbar-width: thin;
             scrollbar-color: var(--primary-color) var(--border-color);
+            cursor: grab;
+        }
+
+        .drawing-row:active {
+            cursor: grabbing;
+        }
+
+        .drawing-row.panning {
+            cursor: grabbing;
+            user-select: none;
         }
 
         .drawing-row::-webkit-scrollbar {
@@ -2186,6 +2196,52 @@
                 e.preventDefault();
                 document.getElementById('zoomReset').click();
             }
+        });
+
+        // ==========================================
+        // 5.1 PAN CONTROLS (ควบคุมการเลื่อน)
+        // ==========================================
+        
+        // Pan ทุก drawing-row
+        const drawingRows = document.querySelectorAll('.drawing-row');
+        drawingRows.forEach(row => {
+            let isPanning = false;
+            let startX, startY;
+            let scrollLeft, scrollTop;
+            
+            row.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+                
+                isPanning = true;
+                row.classList.add('panning');
+                startX = e.pageX - row.offsetLeft;
+                startY = e.pageY - row.offsetTop;
+                scrollLeft = row.scrollLeft;
+                scrollTop = row.scrollTop;
+            });
+            
+            row.addEventListener('mouseleave', () => {
+                isPanning = false;
+                row.classList.remove('panning');
+            });
+            
+            row.addEventListener('mouseup', () => {
+                isPanning = false;
+                row.classList.remove('panning');
+            });
+            
+            row.addEventListener('mousemove', (e) => {
+                if (!isPanning) return;
+                e.preventDefault();
+                
+                const x = e.pageX - row.offsetLeft;
+                const y = e.pageY - row.offsetTop;
+                const walkX = (x - startX) * 1.5;
+                const walkY = (y - startY) * 1.5;
+                
+                row.scrollLeft = scrollLeft - walkX;
+                row.scrollTop = scrollTop - walkY;
+            });
         });
 
         // ==========================================
