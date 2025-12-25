@@ -209,8 +209,6 @@
 </head>
 <body>
 
-    <h1>Structural Details – Column Schedule</h1>
-
     <div id="app" class="schedule-container">
         </div>
 
@@ -1534,7 +1532,7 @@
             dimOffset: 40,   // ระยะห่างเส้น Dimension จากเสา
             textPadding: 50, // ระยะห่างตัวหนังสือใต้เสา
             baseSvgHeight: 400, // ความสูงพื้นฐานของ SVG (ไม่รวมความสูงเสา)
-            showSectionView: false // ปิดการแสดงผล SECTION A-A
+            showSectionView: true // ปิดการแสดงผล SECTION A-A
         };
 
         // ==========================================
@@ -1880,8 +1878,10 @@
             const startX = Math.max(calculatedStartX, 150);
             
             // คำนวณ startY แบบ Bottom-Aligned
-            // Content Height = dim(100) + elevation title(50) + col.height + labels(~160) + section offset(220) + section view(col.width + 100)
-            const contentHeight = 100 + col.height + 160 + 220 + col.width + 100;
+            // Content Height = dim(100) + elevation title(50) + col.height + labels(~160)
+            // + section offset/view เฉพาะเมื่อเปิด Section
+            const sectionHeight = CONFIG.showSectionView ? (220 + col.width + 100) : 0;
+            const contentHeight = 100 + col.height + 160 + sectionHeight;
             const bottomMargin = 50; // เผื่อขอบล่าง
             const topMargin = 100; // เผื่อขอบบน (สำหรับชื่อเสา + dimension)
             // startY = ตำแหน่งที่ทำให้ Content ชิดล่าง
@@ -2014,32 +2014,32 @@
         });
         const unifiedSvgWidth = Math.max(CONFIG.startX + globalMaxColumnWidth + 250, 600);
 
+        // ===== คำนวณความสูงเสาสูงสุดทั้งโปรเจกต์ (ให้ทุกชั้นสูงเท่ากัน) =====
+        let globalMaxColumnHeight = 0;
+        let globalMaxSectionHeight = 0;
+        projectData.forEach(zone => {
+            zone.columns.forEach(c => {
+                const h = c.height || 0;
+                if (h > globalMaxColumnHeight) globalMaxColumnHeight = h;
+
+                if (CONFIG.showSectionView && !c.isTerminated && !c.isSchematic && c.width) {
+                    const currentSecH = c.width + 200; // เพิ่ม padding สำหรับ dimension และ label
+                    if (currentSecH > globalMaxSectionHeight) globalMaxSectionHeight = currentSecH;
+                }
+            });
+        });
+        if (globalMaxColumnHeight === 0) globalMaxColumnHeight = 1500;
+        const globalTotalViewHeight = Math.max(
+            globalMaxColumnHeight + CONFIG.baseSvgHeight + globalMaxSectionHeight,
+            600
+        );
+
         // วนลูปทีละ "โซนชั้น" (Zone)
         projectData.forEach(zone => {
             
-            // 4.1 หาความสูงเสาสูงสุดของ Zone นี้ (เฉพาะเสาที่มี height จริง)
-            let maxColumnHeight = 0;
-            zone.columns.forEach(c => {
-                // ข้าม Schematic/Terminated ที่ไม่มี height หรือใช้ค่า height ถ้ามี
-                const h = c.height || 0;
-                if (h > maxColumnHeight) maxColumnHeight = h;
-            });
-            // ถ้าทุกเสาเป็น Schematic (ไม่มี height) ใช้ค่า default
-            if (maxColumnHeight === 0) maxColumnHeight = 1500;
-            
-            // คำนวณความสูงรวมทั้งหมด (Max Height + Base + Max Section Height)
-            // หาความสูง Section ที่มากที่สุดใน Zone นี้ (เผื่อเสาขนาดไม่เท่ากัน)
-            let maxSectionHeight = 0;
-            if (CONFIG.showSectionView) {
-                zone.columns.forEach(c => {
-                     if (!c.isTerminated && !c.isSchematic && c.width) { // คำนวณเฉพาะเสาที่มี Section และ width
-                         const currentSecH = c.width + 200; // เพิ่ม padding สำหรับ dimension และ label
-                         if(currentSecH > maxSectionHeight) maxSectionHeight = currentSecH;
-                     }
-                });
-            }
-            // ใช้ความสูงเสาสูงสุด + padding + Section Height
-            const totalViewHeight = Math.max(maxColumnHeight + CONFIG.baseSvgHeight + maxSectionHeight, 600);
+            // ใช้ความสูงรวมแบบคงที่ เพื่อให้ทุกชั้นสูงเท่ากัน
+            const maxColumnHeight = globalMaxColumnHeight;
+            const totalViewHeight = globalTotalViewHeight;
 
             // 4.2 สร้าง HTML ส่วนหัวของ Zone
             fullContentHTML += `
