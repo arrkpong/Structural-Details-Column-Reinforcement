@@ -205,7 +205,27 @@
             }
         }
 
+        /* ----- 9.6 Export Button ----- */
+        .export-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: black;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background: linear-gradient(135deg, #20c997, #28a745);
+            transform: scale(1.05);
+        }
+
     </style>
+    <!-- SheetJS Library for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -2078,6 +2098,7 @@
                 <span id="zoomLevel">100%</span>
                 <button id="zoomIn">+</button>
                 <button id="zoomReset">Reset</button>
+                <button id="exportExcel" class="export-btn">Export Excel</button>
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', zoomControlsHTML);
@@ -2129,6 +2150,92 @@
                 document.getElementById('zoomReset').click();
             }
         });
+
+        // ==========================================
+        // 6. EXPORT TO EXCEL
+        // ==========================================
+        
+        function exportToExcel() {
+            // สร้าง Array สำหรับข้อมูล Excel
+            const excelData = [];
+            
+            // Header Row
+            excelData.push([
+                'Zone',
+                'Top Level',
+                'Bottom Level',
+                'Column Name',
+                'Height (mm)',
+                'Width (mm)',
+                'Main Bar',
+                'Confinement Bar',
+                'Tie Bar',
+                'Extra',
+                'Cover',
+                'Status'
+            ]);
+            
+            // วนลูปผ่าน projectData
+            projectData.forEach(zone => {
+                zone.columns.forEach(col => {
+                    let status = 'Full Detail';
+                    if (col.isTerminated) status = 'Terminated';
+                    else if (col.isSchematic) status = 'Schematic';
+                    
+                    excelData.push([
+                        zone.title,
+                        zone.topLevel,
+                        zone.bottomLevel,
+                        col.name,
+                        col.height || '-',
+                        col.width || '-',
+                        col.mainBar || '-',
+                        col.confinementBar || '-',
+                        col.tieBar || '-',
+                        col.extra || '-',
+                        col.cover || '-',
+                        status
+                    ]);
+                });
+            });
+            
+            // สร้าง Workbook และ Worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            
+            // ตั้งค่าความกว้างคอลัมน์
+            ws['!cols'] = [
+                { wch: 30 },  // Zone
+                { wch: 20 },  // Top Level
+                { wch: 20 },  // Bottom Level
+                { wch: 12 },  // Column Name
+                { wch: 12 },  // Height
+                { wch: 10 },  // Width
+                { wch: 20 },  // Main Bar
+                { wch: 20 },  // Confinement Bar
+                { wch: 15 },  // Tie Bar
+                { wch: 15 },  // Extra
+                { wch: 10 },  // Cover
+                { wch: 12 }   // Status
+            ];
+            
+            // เพิ่ม Worksheet ลงใน Workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Column Schedule');
+            
+            // สร้างชื่อไฟล์พร้อมวันที่
+            const today = new Date();
+            const dateStr = today.toISOString().slice(0, 10);
+            const filename = `Column_Schedule_Elevation_${dateStr}.xlsx`;
+            
+            // Download ไฟล์
+            XLSX.writeFile(wb, filename);
+            
+            // แจ้งเตือนสำเร็จ
+            alert(`ส่งออกไฟล์ ${filename} สำเร็จ!`);
+        }
+        
+        // Event Listener สำหรับปุ่ม Export
+        document.getElementById('exportExcel').addEventListener('click', exportToExcel);
 
     </script>
 </body>
