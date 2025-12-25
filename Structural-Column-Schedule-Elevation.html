@@ -94,11 +94,11 @@
         .drawing-row {
             display: flex;
             gap: 0;
-            overflow-x: auto;
-            padding-bottom: 12px;
+            overflow-x: hidden; /* ปิด Scrollbar */
+            padding-bottom: 0;
             align-items: flex-start;
             transform-origin: top left;
-            scrollbar-width: thin;
+            scrollbar-width: none; /* ซ่อน scrollbar สำหรับ Firefox */
             scrollbar-color: var(--primary-color) var(--border-color);
             cursor: grab;
         }
