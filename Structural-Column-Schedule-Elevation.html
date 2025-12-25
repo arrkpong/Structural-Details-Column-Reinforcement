@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Structural Column Schedule (Full Version)</title>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* ==========================================
            CSS Styling for Column Schedule
@@ -20,7 +22,7 @@
 
         /* ---------- 1. Body & Global ---------- */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             padding: 20px; 
             background-color: #f4f4f4; /* พื้นหลังสีเทาอ่อน */
         }
@@ -206,6 +208,8 @@
         }
 
     </style>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <!-- SheetJS Library for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -2076,15 +2080,16 @@
         // เพิ่ม Zoom Controls ลงในหน้า
         const zoomControlsHTML = `
             <div class="zoom-controls">
-                <button id="zoomOut">−</button>
+                <button id="zoomOut"><i data-lucide="zoom-out"></i></button>
                 <span id="zoomLevel">100%</span>
-                <button id="zoomIn">+</button>
-                <button id="zoomReset">Reset</button>
-                <button id="exportExcel" class="export-btn">Export Excel</button>
-                <button id="exportSVG" class="export-svg-btn">Export SVG</button>
+                <button id="zoomIn"><i data-lucide="zoom-in"></i></button>
+                <button id="zoomReset"><i data-lucide="rotate-ccw"></i> Reset</button>
+                <button id="exportExcel"><i data-lucide="file-spreadsheet"></i> Excel</button>
+                <button id="exportSVG"><i data-lucide="image"></i> SVG</button>
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', zoomControlsHTML);
+        lucide.createIcons();
         
         // Zoom State
         let currentZoom = 1;
