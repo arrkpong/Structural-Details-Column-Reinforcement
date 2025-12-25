@@ -205,24 +205,6 @@
             }
         }
 
-        /* ----- 9.6 Export Button ----- */
-        .export-btn {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: black;
-            border: none;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        
-        .export-btn:hover {
-            background: linear-gradient(135deg, #20c997, #28a745);
-            transform: scale(1.05);
-        }
-
     </style>
     <!-- SheetJS Library for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2099,6 +2081,7 @@
                 <button id="zoomIn">+</button>
                 <button id="zoomReset">Reset</button>
                 <button id="exportExcel" class="export-btn">Export Excel</button>
+                <button id="exportSVG" class="export-svg-btn">Export SVG</button>
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', zoomControlsHTML);
@@ -2236,6 +2219,142 @@
         
         // Event Listener สำหรับปุ่ม Export
         document.getElementById('exportExcel').addEventListener('click', exportToExcel);
+
+        // ==========================================
+        // 7. EXPORT TO SVG (รวมทุก Zone เป็น 1 ไฟล์)
+        // ==========================================
+        
+        function exportToSVG() {
+            // แจ้งเตือนว่ากำลังสร้างไฟล์
+            const loadingMsg = document.createElement('div');
+            loadingMsg.id = 'loadingMsg';
+            loadingMsg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#333;color:white;padding:30px 50px;border-radius:10px;z-index:9999;font-size:18px;';
+            loadingMsg.textContent = 'กำลังสร้างไฟล์ SVG... กรุณารอสักครู่';
+            document.body.appendChild(loadingMsg);
+            
+            setTimeout(() => {
+                try {
+                    // เก็บ SVG ทั้งหมดจากแต่ละ Zone
+                    const zones = document.querySelectorAll('.floor-zone');
+                    let totalWidth = 0;
+                    let totalHeight = 0;
+                    const zoneData = [];
+                    
+                    // คำนวณขนาดรวม
+                    zones.forEach((zone, index) => {
+                        const drawingRow = zone.querySelector('.drawing-row');
+                        const zoneTitle = zone.querySelector('.zone-title');
+                        const svgs = drawingRow.querySelectorAll('svg');
+                        
+                        let rowWidth = 0;
+                        let rowHeight = 0;
+                        
+                        svgs.forEach(svg => {
+                            const w = parseInt(svg.getAttribute('width')) || svg.getBoundingClientRect().width;
+                            const h = parseInt(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+                            rowWidth += w;
+                            rowHeight = Math.max(rowHeight, h);
+                        });
+                        
+                        totalWidth = Math.max(totalWidth, rowWidth);
+                        
+                        zoneData.push({
+                            title: zoneTitle ? zoneTitle.textContent : `Zone ${index + 1}`,
+                            svgs: svgs,
+                            rowHeight: rowHeight,
+                            startY: totalHeight // ไม่มี spacing เพื่อให้ box ติดกัน
+                        });
+                        
+                        totalHeight += rowHeight; // ไม่มี spacing เพื่อให้ box ติดกัน
+                    });
+                    
+                    // สร้าง SVG container
+                    const xmlns = 'http://www.w3.org/2000/svg';
+                    const combinedSVG = document.createElementNS(xmlns, 'svg');
+                    combinedSVG.setAttribute('xmlns', xmlns);
+                    combinedSVG.setAttribute('width', totalWidth + 100);
+                    combinedSVG.setAttribute('height', totalHeight + 100);
+                    combinedSVG.setAttribute('viewBox', `0 0 ${totalWidth + 100} ${totalHeight + 100}`);
+                    
+                    // เพิ่มพื้นหลังขาว
+                    const bg = document.createElementNS(xmlns, 'rect');
+                    bg.setAttribute('width', '100%');
+                    bg.setAttribute('height', '100%');
+                    bg.setAttribute('fill', 'white');
+                    combinedSVG.appendChild(bg);
+                    
+                    // วาดแต่ละ Zone
+                    zoneData.forEach((zone, zoneIndex) => {
+                        
+                        // เพิ่ม SVG แต่ละอัน
+                        let currentX = 0;
+                        zone.svgs.forEach(svg => {
+                            const w = parseInt(svg.getAttribute('width')) || 500;
+                            const h = parseInt(svg.getAttribute('height')) || 500;
+                            
+                            // สร้าง group และ translate
+                            const g = document.createElementNS(xmlns, 'g');
+                            g.setAttribute('transform', `translate(${currentX}, ${zone.startY})`);
+                            
+                            // วาดเส้นกรอบ (Border) ของแต่ละ Box
+                            const borderRect = document.createElementNS(xmlns, 'rect');
+                            borderRect.setAttribute('x', '0');
+                            borderRect.setAttribute('y', '0');
+                            borderRect.setAttribute('width', w);
+                            borderRect.setAttribute('height', h);
+                            borderRect.setAttribute('fill', 'white');
+                            borderRect.setAttribute('stroke', 'black');
+                            borderRect.setAttribute('stroke-width', '1');
+                            g.appendChild(borderRect);
+                            
+                            // Clone inner content ของ SVG
+                            Array.from(svg.childNodes).forEach(child => {
+                                g.appendChild(child.cloneNode(true));
+                            });
+                            
+                            combinedSVG.appendChild(g);
+                            currentX += w;
+                        });
+                    });
+                    
+                    // แปลง SVG เป็น string
+                    const serializer = new XMLSerializer();
+                    let svgString = serializer.serializeToString(combinedSVG);
+                    
+                    // เพิ่ม XML declaration
+                    svgString = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgString;
+                    
+                    // สร้าง Blob และ Download
+                    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const today = new Date();
+                    const dateStr = today.toISOString().slice(0, 10);
+                    const filename = `Column_Schedule_Elevation_${dateStr}.svg`;
+                    
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    // ลบ loading message
+                    document.getElementById('loadingMsg').remove();
+                    
+                    alert(`ส่งออกไฟล์ ${filename} สำเร็จ!\nขนาด: ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
+                    
+                } catch (error) {
+                    document.getElementById('loadingMsg').remove();
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                    console.error(error);
+                }
+            }, 100);
+        }
+        
+        // Event Listener สำหรับปุ่ม Export SVG
+        document.getElementById('exportSVG').addEventListener('click', exportToSVG);
 
     </script>
 </body>
